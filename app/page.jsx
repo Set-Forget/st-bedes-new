@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Hero from "./components/home-module/hero";
+import Navbar from "./components/navbar-module/navbar";
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -18,8 +19,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="h-screen w-screen">
+    <main className="h-screen min-w-screen">
       <Hero username={user}/>
+      <Navbar/>
     </main>
   );
 }
