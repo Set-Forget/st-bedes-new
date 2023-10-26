@@ -1,13 +1,9 @@
-import InputType from "../inputType";
-
-
-const Question = ({ question }) => {
+const Question = ({ content }) => {
   return (
-    <div className="question-container">
-        <p>{question.content}</p>
-        <InputType type={question.type} options={question.options} />
+    <div className="question-text-container">
+      <p>{content}</p>
     </div>
-  )
+  );
 };
 
 export default Question;
