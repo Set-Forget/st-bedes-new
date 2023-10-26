@@ -1,12 +1,13 @@
 import React from "react";
 import Question from "./question";
-import InputType from "../inputType";
+import InputType from "./inputType";
 
 const Questionnaire = ({ questions }) => {
-  const renderQuestion = (question) => {
-    console.log("Question Options:", question.options);
-    console.log("Type of Question Options:", typeof question.options);
+  if (!Array.isArray(questions)) {
+    return null && console.error("a question may not be the correct format"); 
+  }
 
+  const renderQuestion = (question) => {
     return (
       <div key={question.question_id} className="question-container">
         <Question content={question.content} />

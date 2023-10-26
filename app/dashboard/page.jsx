@@ -41,6 +41,7 @@ const Page = () => {
   }, []);
 
   const categorizedQuestions = useCategorizedQuestions(questions, userType);
+  console.log("Categorized Questions:", categorizedQuestions);
 
   return (
     <div className="flex w-full min-h-screen justify-center items-center">
@@ -49,14 +50,18 @@ const Page = () => {
         {userType === "student" && (
           <>
             <h2>School Survey</h2>
-            <Questionnaire questions={categorizedQuestions.schoolSurvey} />
+            <Questionnaire
+              questions={categorizedQuestions.studentSurveys.schoolSurvey}
+            />
 
             <h2>Academic Surveys</h2>
-            {categorizedQuestions.academicSurveys.map((survey, index) => (
-              <div key={index}>
-                <Questionnaire questions={survey} />
-              </div>
-            ))}
+            {categorizedQuestions.studentSurveys.academicSurveys.map(
+              (survey, index) => (
+                <div key={index}>
+                  <Questionnaire questions={survey} />
+                </div>
+              )
+            )}
           </>
         )}
         {userType === "parent" && (

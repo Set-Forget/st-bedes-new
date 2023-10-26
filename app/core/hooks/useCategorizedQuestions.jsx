@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 
 export const useCategorizedQuestions = (questions, userType) => {
   const [categorized, setCategorized] = useState({
-    schoolSurvey: [],
-    academicSurveys: [],
+    studentSurveys: {
+      schoolSurvey: [],
+      academicSurveys: [],
+    },
     parentSurveys: {
       sectionA: [],
       sectionB: [],
@@ -35,8 +37,10 @@ export const useCategorizedQuestions = (questions, userType) => {
     });
 
     setCategorized({
-      schoolSurvey: schoolSurvey,
-      academicSurveys: academicSurveys,
+      studentSurveys: {
+        schoolSurvey: schoolSurvey,
+        academicSurveys: academicSurveys,
+      },
       parentSurveys: {
         sectionA: parentSectionA,
         sectionB: parentSectionB,
