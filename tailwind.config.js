@@ -10,6 +10,8 @@ module.exports = {
       colors: {
         bedeblue: '#283363',
         bedeyellow: '#DDC00C',
+        offblack: '#222222',
+        offwhite: '#F8F8F8'
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
