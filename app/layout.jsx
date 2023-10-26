@@ -1,7 +1,7 @@
-import { Overpass } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 
-const overpass = Overpass({ subsets: ["latin"] });
+const open = Open_Sans({ subsets: ["latin"] });
 
 export const metadata = {
   title: "St. Bedes",
@@ -11,7 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${overpass.className} text-offblack bg-offwhite`}>{children}</body>
+      <body className={`${open.className} text-offblack bg-offwhite`}>{children}</body>
     </html>
   );
 }

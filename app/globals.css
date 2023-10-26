@@ -2,3 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeinblob {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+
+.shape01,
+.shape02 {
+  animation: fadeinblob 3s;
+}
+
+.welcome-text {
+  animation: fadein 1.5s;
+}
+
+.subtitle {
+  animation: fadein 3s;
+}
+
+.arrow-anim {
+    opacity: 0;
+}
