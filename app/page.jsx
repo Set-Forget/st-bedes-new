@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     const userData = JSON.parse(sessionStorage.getItem("user"));
-
+    console.log(userData)
     if (userData) {
       setUser(userData.full_name);
     } else {
