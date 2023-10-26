@@ -55,13 +55,9 @@ const Page = () => {
             />
 
             <h2>Academic Surveys</h2>
-            {categorizedQuestions.studentSurveys.academicSurveys.map(
-              (survey, index) => (
-                <div key={index}>
-                  <Questionnaire questions={survey} />
-                </div>
-              )
-            )}
+            <Questionnaire
+              questions={categorizedQuestions.studentSurveys.academicSurveys}
+            />
           </>
         )}
         {userType === "parent" && (

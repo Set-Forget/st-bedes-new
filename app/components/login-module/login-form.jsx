@@ -82,7 +82,7 @@ const LoginForm = () => {
           </button>
         </div>
         <Image
-          className="absolute -bottom-48 left-0"
+          className="absolute -bottom-48 left-0 pointer-events-none"
           width={1000}
           height={0}
           src={errorPic}
