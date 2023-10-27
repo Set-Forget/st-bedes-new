@@ -13,7 +13,7 @@ export const arrowAnimation = (arrowRef) => {
   tl.to(arrow, {
     opacity: 1,
     strokeDashoffset: 0,
-    duration: 1,
+    duration: 0.8,
     ease: "slow(0.3,1,false)",
     delay: 2,           // delay initial anim
     repeat: 1,          // repeat once

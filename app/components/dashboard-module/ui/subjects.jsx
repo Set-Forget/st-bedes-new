@@ -11,7 +11,7 @@ const Subjects = ({ surveys, onSelect }) => {
   }, [surveys]);
 
   return (
-    <div>
+    <div className="flex flex-col">
       {subjects.map((subject, index) => (
         <button key={index} onClick={() => onSelect(subject)}>
           {subject}

@@ -2,8 +2,13 @@
 import React, { useEffect, useState } from "react";
 import Subjects from "@/app/components/dashboard-module/ui/subjects";
 import { Teachers } from "@/app/components/dashboard-module/ui/teachers";
-import { getStudentQuestion } from "@/app/core/services/api/questions";
+import Children from "../components/dashboard-module/ui/children";
+import {
+  getStudentQuestion,
+  getParentQuestion,
+} from "@/app/core/services/api/questions";
 import { useRouter } from "next/navigation";
+import { useCategorizedQuestions } from "../core/hooks/useCategorizedQuestions";
 
 const DashboardPage = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -15,13 +20,30 @@ const DashboardPage = () => {
   const [surveys, setSurveys] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedChild, setSelectedChild] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const categorizedQuestions = useCategorizedQuestions(surveys, userType);
+  const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
+  const schoolSurveys = categorizedQuestions.studentSurveys.schoolSurvey;
+  const allParentSurveys = [
+    ...categorizedQuestions.parentSurveys.sectionA,
+    ...categorizedQuestions.parentSurveys.sectionB,
+    ...categorizedQuestions.parentSurveys.sectionC,
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getStudentQuestion(userId);
+        let data;
+        if (userType === "student") {
+          data = await getStudentQuestion(userId);
+        } else if (userType === "parent") {
+          data = await getParentQuestion(userId);
+          console.log("parent data", data);
+        }
+
         setSurveys(data.response.questions || []);
         setLoading(false);
       } catch (error) {
@@ -32,41 +54,53 @@ const DashboardPage = () => {
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, userType]);
 
   useEffect(() => {
     if (selectedSubject && selectedTeacher) {
       const subjectName = selectedSubject;
       const teacherFullName = selectedTeacher;
       const surveyId = `${subjectName}-${teacherFullName}`;
-
-      // Upon both selections being made, push to the dynamic survey route
       router.push(`/dashboard/${surveyId}`);
     }
   }, [selectedTeacher, selectedSubject, router]);
 
-  console.log(surveys);
+  useEffect(() => {
+    if (userType === "parent" && selectedChild) {
+      router.push(`/dashboard/${selectedChild}`);
+    }
+  }, [userType, selectedChild, router]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  console.log("teachers and subjects components", Teachers, Subjects);
-  console.log("surveys:", surveys);
+  if (userType === "student") {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <h2 className="font-bold text-2xl">School</h2>
+        <button>School survey</button>
 
-  return (
-    <div>
-      {!selectedSubject && (
-        <Subjects surveys={surveys} onSelect={setSelectedSubject} />
-      )}
-      {selectedSubject && !selectedTeacher && (
-        <Teachers
-          subject={selectedSubject}
-          surveys={surveys}
-          onSelect={setSelectedTeacher}
-        />
-      )}
-    </div>
-  );
+        <h2 className="font-bold text-2xl">Academic</h2>
+        {!selectedSubject && (
+          <Subjects surveys={academicSurveys} onSelect={setSelectedSubject} />
+        )}
+        {selectedSubject && !selectedTeacher && (
+          <Teachers
+            subject={selectedSubject}
+            surveys={academicSurveys}
+            onSelect={setSelectedTeacher}
+          />
+        )}
+      </div>
+    );
+  } else if (userType === "parent") {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <h2 className="font-bold text-2xl">Select a Child</h2>
+        <Children surveys={allParentSurveys} onSelect={setSelectedChild} />
+      </div>
+    );
+  }
 };
 
 export default DashboardPage;

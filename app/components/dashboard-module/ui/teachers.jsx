@@ -17,7 +17,7 @@ export const Teachers = ({ subject, surveys, onSelect }) => {
   }, [subject, surveys]);
 
   return (
-    <div>
+    <div className="flex flex-col">
       {teachers.map((teacher, index) => (
         <button key={index} onClick={() => onSelect(teacher)}>
           {teacher}
