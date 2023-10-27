@@ -1,85 +1,72 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  getParentQuestion,
-  getStudentQuestion,
-} from "../core/services/api/questions";
-import { useCategorizedQuestions } from "../core/hooks/useCategorizedQuestions";
-import Questionnaire from "../components/dashboard-module/surveys/questionnaire";
+import Subjects from "@/app/components/dashboard-module/ui/subjects";
+import { Teachers } from "@/app/components/dashboard-module/ui/teachers";
+import { getStudentQuestion } from "@/app/core/services/api/questions";
+import { useRouter } from "next/navigation";
 
-const Page = () => {
+const DashboardPage = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
-  const [questions, setQuestions] = useState([]);
+
+  const router = useRouter();
+
+  const [surveys, setSurveys] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchQuestions = async () => {
-      let fetchedQuestions = [];
-      if (userType === "student") {
+    const fetchData = async () => {
+      try {
         const data = await getStudentQuestion(userId);
-        if (
-          data.status === 200 &&
-          data.response &&
-          Array.isArray(data.response.questions)
-        ) {
-          fetchedQuestions = data.response.questions;
-        }
-      } else if (userType === "parent") {
-        const data = await getParentQuestion(userId);
-        if (
-          data.status === 200 &&
-          data.response &&
-          Array.isArray(data.response.questions)
-        ) {
-          fetchedQuestions = data.response.questions;
-        }
+        setSurveys(data.response.questions || []);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+        console.error("Dashboard fetch data error:", error);
       }
-      setQuestions(fetchedQuestions);
     };
-    fetchQuestions();
-  }, []);
 
-  const categorizedQuestions = useCategorizedQuestions(questions, userType);
-  console.log("Categorized Questions:", categorizedQuestions);
+    fetchData();
+  }, [userId]);
+
+  useEffect(() => {
+    if (selectedSubject && selectedTeacher) {
+      const subjectName = selectedSubject;
+      const teacherFullName = selectedTeacher;
+      const surveyId = `${subjectName}-${teacherFullName}`;
+
+      // Upon both selections being made, push to the dynamic survey route
+      router.push(`/dashboard/${surveyId}`);
+    }
+  }, [selectedTeacher, selectedSubject, router]);
+
+  console.log(surveys);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  console.log("teachers and subjects components", Teachers, Subjects);
+  console.log("surveys:", surveys);
 
   return (
-    <div className="flex w-full min-h-screen justify-center items-center">
-      <h1>Dashboard</h1>
-      <div className="dashboard-content">
-        {userType === "student" && (
-          <>
-            <h2>School Survey</h2>
-            <Questionnaire
-              questions={categorizedQuestions.studentSurveys.schoolSurvey}
-            />
-
-            <h2>Academic Surveys</h2>
-            <Questionnaire
-              questions={categorizedQuestions.studentSurveys.academicSurveys}
-            />
-          </>
-        )}
-        {userType === "parent" && (
-          <>
-            <h2>Parent Surveys</h2>
-            <Questionnaire
-              questions={categorizedQuestions.parentSurveys.sectionA}
-              title="Section A"
-            />
-            <Questionnaire
-              questions={categorizedQuestions.parentSurveys.sectionB}
-              title="Section B"
-            />
-            <Questionnaire
-              questions={categorizedQuestions.parentSurveys.sectionC}
-              title="Section C"
-            />
-          </>
-        )}
-      </div>
+    <div>
+      {!selectedSubject && (
+        <Subjects surveys={surveys} onSelect={setSelectedSubject} />
+      )}
+      {selectedSubject && !selectedTeacher && (
+        <Teachers
+          subject={selectedSubject}
+          surveys={surveys}
+          onSelect={setSelectedTeacher}
+        />
+      )}
     </div>
   );
 };
 
-export default Page;
+export default DashboardPage;
