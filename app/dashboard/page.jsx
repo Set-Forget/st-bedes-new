@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useCategorizedQuestions } from "../core/hooks/useCategorizedQuestions";
 import Navbar from "../components/navbar-module/navbar";
 import SpinnerBlack from "../components/spinner-component/spinnerBlack";
+import useSurveyStatus from "../core/hooks/useSurveyStatus";
 
 const DashboardPage = () => {
   const [user, setUser] = useState(() =>
@@ -18,6 +19,7 @@ const DashboardPage = () => {
   );
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
+  console.log("user id:", userId);
   const router = useRouter();
 
   const [surveys, setSurveys] = useState([]);
@@ -48,6 +50,7 @@ const DashboardPage = () => {
     );
   }, [allParentSurveys]);
 
+  // fetch all questions based on the type of user logged in
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,6 +73,11 @@ const DashboardPage = () => {
     fetchData();
   }, [userId, userType]);
 
+  const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
+  console.log("surveys before using the useSurveyStatus:", surveys)
+  console.log("pending surveys:" , pendingSurveys);
+  console.log("completed surveys:" , completedSurveys);
+
   useEffect(() => {
     if (selectedSubject && selectedTeacher) {
       const surveyId = `${selectedSubject}-${selectedTeacher}`;
@@ -79,11 +87,12 @@ const DashboardPage = () => {
     }
   }, [userType, selectedTeacher, selectedSubject, selectedChild, router]);
 
+  // reset selection handler for simpler navigation
   const resetSubjectSelection = () => {
     setSelectedSubject(null);
     setSelectedTeacher(null);
   };
-
+  // rendered content based on user type
   const content = useMemo(() => {
     if (userType === "student") {
       return (
@@ -115,7 +124,7 @@ const DashboardPage = () => {
       return (
         <>
           <h2 className="font-bold text-2xl">Select a Child</h2>
-          <Children surveys={uniqueChildren} onSelect={setSelectedChild} />
+          <Children surveys={uniqueChildren} onSelect={setSelectedChild} pendingSurveys={pendingSurveys} completedSurveys={completedSurveys} />
         </>
       );
     }
