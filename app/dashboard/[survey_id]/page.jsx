@@ -8,6 +8,7 @@ import {
 import Questionnaire from "@/app/components/dashboard-module/surveys/questionnaire";
 import { useCategorizedQuestions } from "@/app/core/hooks/useCategorizedQuestions";
 import { useFilterQuestions } from "@/app/core/hooks/useFilterQuestions";
+import SpinnerBlack from "@/app/components/spinner-component/spinnerBlack";
 
 const SurveyPage = () => {
   const { subject, teacher, child } = useDecodedSurveyId();
@@ -50,8 +51,6 @@ const SurveyPage = () => {
   let sectionB = [];
   let sectionC = [];
 
-  if (isLoading) return <div>Loading...</div>;
-
   // Handling for student and parent user types
   if (userType === "student") {
     const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
@@ -79,6 +78,8 @@ const SurveyPage = () => {
 
     filteredQuestions = [...sectionA, ...sectionB, ...sectionC];
   }
+
+  console.log("user type:", userType);
 
   // renders determined content based on type of user currently logged in
   const content =
@@ -108,7 +109,12 @@ const SurveyPage = () => {
       </>
     );
 
-  return <div>{content}</div>;
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center">
+      {isLoading && <SpinnerBlack/>}
+      {!isLoading && <div>{content}</div>}
+    </div>
+  );
 };
 
 export default SurveyPage;

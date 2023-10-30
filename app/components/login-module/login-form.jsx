@@ -1,7 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import {authenticateParent, authenticateStudent} from "@/app/core/services/api/auth";
+import {
+  authenticateParent,
+  authenticateStudent,
+} from "@/app/core/services/api/auth";
 import { useCheckLoginStatus } from "@/app/core/hooks/useCheckLoginStatus";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -9,7 +12,11 @@ import errorPic from "@/public/error-page-illustration.svg";
 import Spinner from "../spinner-component/spinner";
 
 const LoginForm = () => {
-  const {register, handleSubmit, formState: { errors }} = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const [loginType, setLoginType] = useState("student"); // login page defaults as student
   const [error, setError] = useState("");
@@ -30,7 +37,7 @@ const LoginForm = () => {
     }
     try {
       let response;
-      
+
       // wether its a student or parent, it uses a different api endpoint
       if (loginType === "student") {
         response = await authenticateStudent(email, password);
@@ -93,43 +100,88 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="form-container p-12 flex flex-col items-center shadow-lg py-24 rounded-lg">
-      <h1 className="text-4xl p-3 font-bold">{`Logging in as a ${loginType}`}</h1>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col justify-center items-start space-y-12 my-24"
-      >
-        <input
-          type="email"
-          {...register("email", { required: "Email is required." })}
-          placeholder="email"
-          className="border-b text-2xl w-[500px] p-6"
-        />
-        {errors.email && <p className="text-sm text-red-500 animate-pulse">{errors.email.message}</p>}
-        <input
-          type="password"
-          {...register("password", { required: "Password is required." })}
-          placeholder="password"
-          className="border-b text-2xl w-[500px] p-6"
-        />
-        {errors.password && <p className="text-sm text-red-500 animate-pulse">{errors.password.message}</p>}
-        {error && <p className="text-sm text-red-500 animate-pulse">{error}</p>}
-        <button
-          type="submit"
-          className="self-center text-2xl font-bold bg-bedeblue text-white px-24 py-2 rounded-lg opacity-90 hover:opacity-100 transition-all"
-        >
-          {isLoading ? <Spinner /> : "Login"}
-        </button>
-      </form>
-      <button
-        onClick={toggleLoginType}
-        className={`text-lg self-end hover:font-bold transition-all ${
-          isLoading ? "opacity-50 pointer-events-none" : ""
-        }`}
-      >
-        {`I'm a ${loginType === "student" ? "parent" : "student"}`}
-      </button>
-    </div>
+    <>
+      <div className="flex min-h-full w-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="mt-10 text-center text-2xl leading-9 tracking-tight text-gray-900">
+            Sign in as a <b>{loginType}</b>
+          </h2>
+        </div>
+
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                Email address
+              </label>
+              <div className="mt-2">
+                <input
+                  type="email"
+                  {...register("email", { required: "Email is required." })}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-bedeblue sm:text-sm sm:leading-6"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-sm text-red-500 animate-pulse">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium leading-6 text-gray-900"
+                >
+                  Password
+                </label>
+              </div>
+              <div className="mt-2">
+                <input
+                  type="password"
+                  {...register("password", {
+                    required: "Password is required.",
+                  })}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-bedeblue sm:text-sm sm:leading-6"
+                />
+              </div>
+              {errors.password && (
+                <p className="text-sm text-red-500 animate-pulse">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {error && (
+              <p className="text-sm text-red-500 animate-pulse">{error}</p>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                className={`flex w-full justify-center rounded-md bg-bedeblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isLoading ? 'cursor-wait opacity-90' : ''}`}
+              >
+                {isLoading ? <Spinner /> : "Sign in"}
+              </button>
+            </div>
+          </form>
+
+          <p className="mt-10 text-center text-sm text-gray-500">
+            {`I'm a ${loginType === "student" ? "parent" : "student"}. `}
+            <button
+              onClick={toggleLoginType}
+              className={`font-semibold leading-6 text-bedeblue hover:text-blue-800 transition-colors ${isLoading ? 'opacity-90 pointer-events-none' : ''}`}
+            >
+              Switch role
+            </button>
+          </p>
+        </div>
+      </div>
+    </>
   );
 };
 

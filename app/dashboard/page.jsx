@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useCategorizedQuestions } from "../core/hooks/useCategorizedQuestions";
 import Navbar from "../components/navbar-module/navbar";
+import SpinnerBlack from "../components/spinner-component/spinnerBlack";
 
 const DashboardPage = () => {
   const [user, setUser] = useState(() =>
@@ -78,6 +79,11 @@ const DashboardPage = () => {
     }
   }, [userType, selectedTeacher, selectedSubject, selectedChild, router]);
 
+  const resetSubjectSelection = () => {
+    setSelectedSubject(null);
+    setSelectedTeacher(null);
+  };
+
   const content = useMemo(() => {
     if (userType === "student") {
       return (
@@ -89,11 +95,19 @@ const DashboardPage = () => {
             <Subjects surveys={academicSurveys} onSelect={setSelectedSubject} />
           )}
           {selectedSubject && !selectedTeacher && (
-            <Teachers
-              subject={selectedSubject}
-              surveys={academicSurveys}
-              onSelect={setSelectedTeacher}
-            />
+            <>
+              <Teachers
+                subject={selectedSubject}
+                surveys={academicSurveys}
+                onSelect={setSelectedTeacher}
+              />
+              <button
+                onClick={resetSubjectSelection}
+                className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
+              >
+                Choose a different subject
+              </button>
+            </>
           )}
         </>
       );
@@ -113,13 +127,13 @@ const DashboardPage = () => {
     uniqueChildren,
   ]);
 
-  if (loading) return <p>Loading...</p>;
   if (error) return <p>Oops, something unexpected happened: {error}</p>;
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center min-h-screen">
       <Navbar />
-      <div>{content}</div>
+      {loading && <SpinnerBlack />}
+      {!loading && <div>{content}</div>}
     </div>
   );
 };
