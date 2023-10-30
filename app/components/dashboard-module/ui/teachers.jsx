@@ -17,12 +17,29 @@ export const Teachers = ({ subject, surveys, onSelect }) => {
   }, [subject, surveys]);
 
   return (
-    <div className="flex flex-col">
+    <ul role="list" className="divide-y divide-gray-100">
       {teachers.map((teacher, index) => (
-        <button key={index} onClick={() => onSelect(teacher)}>
-          {teacher}
-        </button>
+        <li
+          key={index}
+          className="flex items-center justify-between gap-x-96 py-5"
+        >
+          <div className="min-w-0">
+            <div className="flex items-start gap-x-3">
+              <p className="text-sm font-semibold leading-6 text-gray-900">
+                {teacher}
+              </p>
+            </div>
+            <p className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+              Teacher
+            </p>
+          </div>
+          <div className="flex flex-none items-center gap-x-4">
+            <button className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block" onClick={() => onSelect(teacher)}>
+              Choose<span className="sr-only">, {teacher}</span>
+            </button>
+          </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };

@@ -4,7 +4,8 @@ import InputType from "./inputType";
 
 const Questionnaire = ({ questions }) => {
   if (!Array.isArray(questions)) {
-    return null && console.error("a question may not be the correct format"); 
+    console.error("a question may not be the correct format");
+    return null;
   }
 
   const renderQuestion = (question) => {

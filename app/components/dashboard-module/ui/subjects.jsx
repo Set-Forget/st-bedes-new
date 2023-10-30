@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const Subjects = ({ surveys, onSelect }) => {
+export const Subjects = ({ surveys, onSelect }) => {
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
@@ -11,14 +11,29 @@ const Subjects = ({ surveys, onSelect }) => {
   }, [surveys]);
 
   return (
-    <div className="flex flex-col">
+    <ul role="list" className="divide-y divide-gray-100">
       {subjects.map((subject, index) => (
-        <button key={index} onClick={() => onSelect(subject)}>
-          {subject}
-        </button>
+        <li
+          key={index}
+          className="flex items-center justify-between gap-x-96 py-5"
+        >
+          <div className="min-w-0">
+            <div className="flex items-start gap-x-3">
+              <p className="text-sm font-semibold leading-6 text-gray-900">
+                {subject}
+              </p>
+            </div>
+            <p className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+              School subject
+            </p>
+          </div>
+          <div className="flex flex-none items-center gap-x-4">
+            <button className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block" onClick={() => onSelect(subject)}>
+              Choose<span className="sr-only">, {subject}</span>
+            </button>
+          </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 };
-
-export default Subjects;

@@ -86,6 +86,7 @@ const LoginForm = () => {
           width={1000}
           height={0}
           src={errorPic}
+          alt="error picture"
         />
       </div>
     );
