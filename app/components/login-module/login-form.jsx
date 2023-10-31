@@ -46,7 +46,6 @@ const LoginForm = () => {
       }
 
       if (response && response.status === 200) {
-        console.log("Logged in successfully", response);
         sessionStorage.setItem("user", JSON.stringify(response.response));
         router.push("/");
       } else if (
@@ -104,7 +103,7 @@ const LoginForm = () => {
       <div className="flex min-h-full w-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl leading-9 tracking-tight text-gray-900">
-            Sign in as a <b>{loginType}</b>
+            Sign in as a <b className="text-bedeblue">{loginType}</b>
           </h2>
         </div>
 
@@ -163,7 +162,9 @@ const LoginForm = () => {
             <div>
               <button
                 type="submit"
-                className={`flex w-full justify-center rounded-md bg-bedeblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isLoading ? 'cursor-wait opacity-90' : ''}`}
+                className={`flex w-full justify-center rounded-md bg-bedeblue px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  isLoading ? "cursor-wait opacity-90" : ""
+                }`}
               >
                 {isLoading ? <Spinner /> : "Sign in"}
               </button>
@@ -174,7 +175,9 @@ const LoginForm = () => {
             {`I'm a ${loginType === "student" ? "parent" : "student"}. `}
             <button
               onClick={toggleLoginType}
-              className={`font-semibold leading-6 text-bedeblue hover:text-blue-800 transition-colors ${isLoading ? 'opacity-90 pointer-events-none' : ''}`}
+              className={`font-semibold leading-6 text-bedeblue hover:text-blue-800 transition-colors ${
+                isLoading ? "opacity-90 pointer-events-none" : ""
+              }`}
             >
               Switch role
             </button>

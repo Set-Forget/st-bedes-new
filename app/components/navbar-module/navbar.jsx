@@ -9,7 +9,7 @@ const Navbar = () => {
   useLayoutEffect(() => {}, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full flex justify-between items-center px-16 py-8 shadow-sm">
+    <div className="absolute z-50 top-0 left-0 w-full flex justify-between items-center px-16 py-8 shadow-sm">
       <div className="font-bold text-lg">St. Bede's College</div>
       <div className="flex space-x-8 items-center">
         <Link href="/" className="text-lg">

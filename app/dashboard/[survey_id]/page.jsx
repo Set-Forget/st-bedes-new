@@ -9,6 +9,7 @@ import Questionnaire from "@/app/components/dashboard-module/surveys/questionnai
 import { useCategorizedQuestions } from "@/app/core/hooks/useCategorizedQuestions";
 import { useFilterQuestions } from "@/app/core/hooks/useFilterQuestions";
 import SpinnerBlack from "@/app/components/spinner-component/spinnerBlack";
+import Navbar from "@/app/components/navbar-module/navbar";
 
 const SurveyPage = () => {
   const { subject, teacher, child } = useDecodedSurveyId();
@@ -44,6 +45,7 @@ const SurveyPage = () => {
   }, [userId, userType]);
 
   const categorizedQuestions = useCategorizedQuestions(questions, userType);
+  const schoolSurvey = categorizedQuestions.studentSurveys.schoolSurvey;
 
   // Initialization
   let filteredQuestions = [];
@@ -61,11 +63,6 @@ const SurveyPage = () => {
         question.student_id && question.student_id.toString() === child
     );
 
-    console.log(
-      "question id:",
-      questions.map((question) => question.student_id)
-    );
-
     sectionA = childQuestions.filter((question) =>
       question.section.startsWith("Section A")
     );
@@ -79,13 +76,20 @@ const SurveyPage = () => {
     filteredQuestions = [...sectionA, ...sectionB, ...sectionC];
   }
 
-  console.log("user type:", userType);
-
   // renders determined content based on type of user currently logged in
-  const content =
-    userType === "student" ? (
-      <Questionnaire questions={filteredQuestions} />
-    ) : (
+  let content;
+
+  if (subject === "School" && userType === "student") {
+    content = (
+      <div>
+        <h1>school survey</h1>
+        <Questionnaire questions={schoolSurvey} />
+      </div>
+    );
+  } else if (subject === "Academic" && userType === "student") {
+    content = <Questionnaire questions={filteredQuestions} />;
+  } else if (userType === "parent") {
+    content = (
       <>
         <h1>should only be visible to parents</h1>
         {sectionA.length > 0 && (
@@ -108,11 +112,13 @@ const SurveyPage = () => {
         )}
       </>
     );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center">
-      {isLoading && <SpinnerBlack/>}
-      {!isLoading && <div>{content}</div>}
+    <div className="relative min-h-screen flex flex-col justify-center items-center overscroll-x-hidden">
+    <Navbar/>
+      {isLoading && <SpinnerBlack />}
+      {!isLoading && <div className="h-full mt-48">{content}</div>}
     </div>
   );
 };
