@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { useCategorizedQuestions } from "../core/hooks/useCategorizedQuestions";
 import Navbar from "../components/navbar-module/navbar";
 import SpinnerBlack from "../components/spinner-component/spinnerBlack";
+import useSurveyStatus from "../core/hooks/useSurveyStatus";
+import { School } from "../components/dashboard-module/ui/school";
 
 const DashboardPage = () => {
   const [user, setUser] = useState(() =>
@@ -18,6 +20,7 @@ const DashboardPage = () => {
   );
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
+  console.log("user id:", userId);
   const router = useRouter();
 
   const [surveys, setSurveys] = useState([]);
@@ -29,6 +32,7 @@ const DashboardPage = () => {
 
   const categorizedQuestions = useCategorizedQuestions(surveys, userType);
   const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
+  const { schoolSurvey } = categorizedQuestions.studentSurveys;
   const allParentSurveys = useMemo(
     () => [
       ...categorizedQuestions.parentSurveys.sectionA,
@@ -48,6 +52,7 @@ const DashboardPage = () => {
     );
   }, [allParentSurveys]);
 
+  // fetch all questions based on the type of user logged in
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,26 +75,48 @@ const DashboardPage = () => {
     fetchData();
   }, [userId, userType]);
 
+  const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
+
+  // console.log("surveys before using the useSurveyStatus:", surveys);
+  // console.log("pending surveys:", pendingSurveys);
+  // console.log("completed surveys:", completedSurveys);
+  // console.log("school survey", {schoolSurvey});
+  // console.log("school survey", schoolSurvey);
+
   useEffect(() => {
-    if (selectedSubject && selectedTeacher) {
+    if (selectedSubject === "School" && userType === "student") {
+      router.push(`/dashboard/School-${userId}`);
+    } else if (selectedSubject && selectedTeacher) {
       const surveyId = `${selectedSubject}-${selectedTeacher}`;
       router.push(`/dashboard/${surveyId}`);
     } else if (userType === "parent" && selectedChild) {
       router.push(`/dashboard/${selectedChild.id}`);
     }
-  }, [userType, selectedTeacher, selectedSubject, selectedChild, router]);
+  }, [
+    userType,
+    selectedTeacher,
+    selectedSubject,
+    selectedChild,
+    router,
+    userId,
+  ]);
 
+  // reset selection handler for simpler navigation
   const resetSubjectSelection = () => {
     setSelectedSubject(null);
     setSelectedTeacher(null);
   };
-
+  // rendered content based on user type
   const content = useMemo(() => {
     if (userType === "student") {
       return (
-        <>
+        <div className="flex flex-col overflow-x-hidden py-64">
           <h2 className="font-bold text-2xl">School</h2>
-          <button>School survey</button>
+          <School
+            survey={schoolSurvey}
+            onSelect={() => setSelectedSubject("School")}
+          />
+
           <h2 className="font-bold text-2xl">Academic</h2>
           {!selectedSubject && (
             <Subjects surveys={academicSurveys} onSelect={setSelectedSubject} />
@@ -103,20 +130,25 @@ const DashboardPage = () => {
               />
               <button
                 onClick={resetSubjectSelection}
-                className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
+                className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block mt-4 self-center"
               >
                 Choose a different subject
               </button>
             </>
           )}
-        </>
+        </div>
       );
     } else if (userType === "parent") {
       return (
-        <>
+        <div className="overflow-x-hidden">
           <h2 className="font-bold text-2xl">Select a Child</h2>
-          <Children surveys={uniqueChildren} onSelect={setSelectedChild} />
-        </>
+          <Children
+            surveys={uniqueChildren}
+            onSelect={setSelectedChild}
+            pendingSurveys={pendingSurveys}
+            completedSurveys={completedSurveys}
+          />
+        </div>
       );
     }
   }, [
@@ -130,10 +162,10 @@ const DashboardPage = () => {
   if (error) return <p>Oops, something unexpected happened: {error}</p>;
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen">
+    <div className="relative flex flex-col justify-center items-center w-full min-h-screen overscroll-x-hidden">
       <Navbar />
       {loading && <SpinnerBlack />}
-      {!loading && <div>{content}</div>}
+      {!loading && <div className="content-container">{content}</div>}
     </div>
   );
 };
