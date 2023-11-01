@@ -32,6 +32,8 @@ const SurveyPage = () => {
         data = await getParentQuestion(userId);
       }
 
+      console.log(`API Response for ${userType}:`, data);
+
       if (data && data.response && data.response.questions) {
         setQuestions(data.response.questions);
         setIsLoading(false);
@@ -47,6 +49,8 @@ const SurveyPage = () => {
   const categorizedQuestions = useCategorizedQuestions(questions, userType);
   const schoolSurvey = categorizedQuestions.studentSurveys.schoolSurvey;
 
+  console.log('Categorized Questions:', categorizedQuestions);
+
   // Initialization
   let filteredQuestions = [];
   let sectionA = [];
@@ -57,11 +61,13 @@ const SurveyPage = () => {
   if (userType === "student") {
     const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
     filteredQuestions = useFilterQuestions(subject, teacher, academicSurveys);
+    console.log('Filtered Questions for Academic Surveys:', filteredQuestions);
   } else if (userType === "parent") {
     const childQuestions = questions.filter(
       (question) =>
         question.student_id && question.student_id.toString() === child
     );
+    console.log('Parent Questions for Child:', childQuestions);
 
     sectionA = childQuestions.filter((question) =>
       question.section.startsWith("Section A")
@@ -86,12 +92,11 @@ const SurveyPage = () => {
         <Questionnaire questions={schoolSurvey} />
       </div>
     );
-  } else if (subject === "Academic" && userType === "student") {
+  } else if (subject !== "School" && userType === "student") {
     content = <Questionnaire questions={filteredQuestions} />;
   } else if (userType === "parent") {
     content = (
       <>
-        <h1>should only be visible to parents</h1>
         {sectionA.length > 0 && (
           <div className="mb-4">
             <h2 className="text-xl font-semibold mb-2">Section A</h2>
@@ -113,6 +118,10 @@ const SurveyPage = () => {
       </>
     );
   }
+
+  console.log('Rendered Content:', content);
+  console.log("Subject value:", subject);
+
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center overscroll-x-hidden">

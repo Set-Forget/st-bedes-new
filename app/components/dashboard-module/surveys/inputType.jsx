@@ -1,17 +1,14 @@
-import { useParseOptions } from "@/app/core/hooks/useParseOptions";
 import React from "react";
 
-const InputType = ({ type, options }) => {
-  const parsedOptions = useParseOptions(options);
-
+const InputType = ({ type, options, register, name }) => {
   switch (type) {
     case "text":
-      return <input type="text" />;
-
+      return <input type="text" {...register(name)} />;
+      
     case "select":
       return (
-        <select>
-          {parsedOptions.map((option, index) => (
+        <select {...register(name)}>
+          {options.map((option, index) => (
             <option key={index} value={option}>
               {option}
             </option>

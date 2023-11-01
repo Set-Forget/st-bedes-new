@@ -36,3 +36,8 @@
 .arrow-anim {
     opacity: 0;
 }
+
+form {
+  text-wrap: balance;
+  max-inline-size: 70ch;
+}
