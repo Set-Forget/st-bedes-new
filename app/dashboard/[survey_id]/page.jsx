@@ -48,26 +48,21 @@ const SurveyPage = () => {
 
   const categorizedQuestions = useCategorizedQuestions(questions, userType);
   const schoolSurvey = categorizedQuestions.studentSurveys.schoolSurvey;
-
-  console.log('Categorized Questions:', categorizedQuestions);
-
-  // Initialization
-  let filteredQuestions = [];
+  const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
+  let filteredQuestions = useFilterQuestions(subject, teacher, academicSurveys);
   let sectionA = [];
   let sectionB = [];
   let sectionC = [];
 
   // Handling for student and parent user types
   if (userType === "student") {
-    const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
-    filteredQuestions = useFilterQuestions(subject, teacher, academicSurveys);
-    console.log('Filtered Questions for Academic Surveys:', filteredQuestions);
+    console.log("Filtered Questions for Academic Surveys:", filteredQuestions);
   } else if (userType === "parent") {
     const childQuestions = questions.filter(
       (question) =>
         question.student_id && question.student_id.toString() === child
     );
-    console.log('Parent Questions for Child:', childQuestions);
+    console.log("Parent Questions for Child:", childQuestions);
 
     sectionA = childQuestions.filter((question) =>
       question.section.startsWith("Section A")
@@ -119,13 +114,12 @@ const SurveyPage = () => {
     );
   }
 
-  console.log('Rendered Content:', content);
+  console.log("Rendered Content:", content);
   console.log("Subject value:", subject);
-
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center overscroll-x-hidden">
-    <Navbar/>
+      <Navbar />
       {isLoading && <SpinnerBlack />}
       {!isLoading && <div className="h-full mt-48">{content}</div>}
     </div>
