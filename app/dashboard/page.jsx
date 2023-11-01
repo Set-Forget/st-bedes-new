@@ -15,9 +15,13 @@ import useSurveyStatus from "../core/hooks/useSurveyStatus";
 import { School } from "../components/dashboard-module/ui/school";
 
 const DashboardPage = () => {
-  const [user, setUser] = useState(() =>
-    JSON.parse(sessionStorage.getItem("user"))
-  );
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(sessionStorage.getItem("user"));
+    setUser(storedUser || {});
+  }, []);
+
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
   console.log("user id:", userId);

@@ -1,15 +1,8 @@
-import { useEffect, useState } from "react";
+const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-export const useCheckLoginStatus = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
+useEffect(() => {
     const loggedInUser = sessionStorage.getItem("user");
-
     if (loggedInUser) {
-      setIsLoggedIn(true);
+        setIsLoggedIn(true);
     }
-  }, []);
-
-  return isLoggedIn;
-};
+}, []);

@@ -16,9 +16,13 @@ const Questionnaire = ({ questions }) => {
     getValues,
     formState: { errors },
   } = useForm({ shouldUnregister: false });
-  const [user, setUser] = useState(() =>
-    JSON.parse(sessionStorage.getItem("user"))
-  );
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const storedUser = JSON.parse(sessionStorage.getItem("user"));
+    setUser(storedUser || {});
+  }, []);
+
   const userType = user.student_id ? "student" : "parent";
   const [feedbackMessage, setFeedbackMessage] = useState(null);
 
@@ -65,8 +69,7 @@ const Questionnaire = ({ questions }) => {
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
           setFeedbackMessage("Answers successfully saved!");
-          router.push('/success')
-
+          router.push("/success");
         } else {
           setFeedbackMessage(
             "There was an issue saving your answers. Please try again later."
@@ -105,7 +108,10 @@ const Questionnaire = ({ questions }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="questionnaire-container p-8 sm:p-0">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="questionnaire-container p-8 sm:p-0"
+    >
       {questions.map(renderQuestion)}
       <button
         type="submit"
