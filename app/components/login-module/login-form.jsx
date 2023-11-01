@@ -5,7 +5,7 @@ import {
   authenticateParent,
   authenticateStudent,
 } from "@/app/core/services/api/auth";
-import { useCheckLoginStatus } from "@/app/core/hooks/useCheckLoginStatus";
+import useCheckLoginStatus from "@/app/core/hooks/useCheckLoginStatus";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import errorPic from "@/public/error-page-illustration.svg";
