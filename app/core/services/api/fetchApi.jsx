@@ -34,7 +34,7 @@ export const fetchApi = async (action, params = {}, method = "GET") => {
   const contentType = response.headers.get("content-type");
   if (contentType && contentType.includes("application/json")) {
     const responseData = await response.text();
-    console.log("Response Data:", responseData);
+    // console.log("Response Data:", responseData);
     return JSON.parse(responseData);
   } else {
     throw new Error("Unexpected content type received.");

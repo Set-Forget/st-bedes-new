@@ -12,13 +12,17 @@ import SpinnerBlack from "@/app/components/spinner-component/spinnerBlack";
 import Navbar from "@/app/components/navbar-module/navbar";
 
 const SurveyPage = () => {
-  const { subject, teacher, child } = useDecodedSurveyId();
-  const [user, setUser] = useState(() =>
-    JSON.parse(sessionStorage.getItem("user"))
-  );
+  const isBrowser = typeof window !== "undefined";
+
+  const [user, setUser] = useState(() => {
+    if (isBrowser) {
+      return JSON.parse(sessionStorage.getItem("user"));
+    }
+    return {};
+  });
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
-
+  const { subject, teacher, child } = useDecodedSurveyId();
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
