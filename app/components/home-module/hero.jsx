@@ -9,17 +9,17 @@ const Hero = ({ username }) => {
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center">
+    <div className="w-screen h-screen overflow-hidden flex flex-col justify-center items-center relative">
       <div className="hero-main flex flex-col items-center text-center">
-        <h1 className="welcome-text text-[16vh] font-black leading-none">{`Welcome`}</h1>
-        <h2 className="welcome-text text-[6vh] font-bold">{username}</h2>
-        <h3 className="subtitle text-[2vh]">
+        <h1 className="welcome-text lg:text-[16vh] text-[6vh] font-black leading-none">{`Welcome`}</h1>
+        <h2 className="welcome-text lg:text-[6vh] text-[3.5vh] font-bold">{username}</h2>
+        <h3 className="subtitle lg:text-[2vh] text-lg px-8 sm:px-0 mt-8">
           Head over to your dashboard to find your surveys
         </h3>
         <div className="pointer-events-none shape01 absolute bottom-96 left-96 sm:w-[20vw] sm:h-[20vw] w-48 h-48 bg-bedeyellow rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob"></div>
         <div className="pointer-events-none shape02 absolute top-48 left-48 sm:w-[25vw] sm:h-[25vw] w-48 h-48 bg-bedeblue rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob animation-delay-2000"></div>
         <svg
-          className="absolute top-24 right-56"
+          className="absolute top-24 right-[46rem] hidden sm:block"
           xmlns="http://www.w3.org/2000/svg"
           width="630"
           height="379"

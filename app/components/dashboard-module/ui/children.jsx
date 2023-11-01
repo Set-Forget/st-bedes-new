@@ -32,7 +32,7 @@ export const Children = ({
       {surveys.map((child) => (
         <li
           key={child.id}
-          className="flex items-center justify-between gap-x-96 py-5"
+          className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5"
         >
           <div className="min-w-0">
             <div className="flex items-start gap-x-3">

@@ -77,18 +77,18 @@ const LoginForm = () => {
     return (
       <div className="relative flex h-screen w-screen justify-center items-start overflow-hidden">
         <div className="flex flex-col">
-          <h1 className="font-black text-[15vh] text-center leading-none mt-96 pointer-events-none">
+          <h1 className="font-black text-[6vh] sm:text-[15vh] text-center leading-none mt-96 pointer-events-none">
             You shouldn&apos;t be here!
           </h1>
           <button
-            className="text-[5vh] hover:underline self-center mt-16"
+            className="text-[3vh] sm:text-[5vh] hover:underline self-center mt-16"
             onClick={() => router.push("/")}
           >
             Go back
           </button>
         </div>
         <Image
-          className="absolute -bottom-48 left-0 pointer-events-none"
+          className="absolute -bottom-48 sm:left-0 pointer-events-none"
           width={1000}
           height={0}
           src={errorPic}
@@ -172,7 +172,7 @@ const LoginForm = () => {
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            {`I'm a ${loginType === "student" ? "parent" : "student"}. `}
+            {`Im a ${loginType === "student" ? "parent" : "student"}. `}
             <button
               onClick={toggleLoginType}
               className={`font-semibold leading-6 text-bedeblue hover:text-blue-800 transition-colors ${

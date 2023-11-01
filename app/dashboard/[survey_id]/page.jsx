@@ -96,26 +96,26 @@ const SurveyPage = () => {
     content = <Questionnaire questions={filteredQuestions} />;
   } else if (userType === "parent") {
     content = (
-      <>
+      <div className="sm:py-64 pb-32 divide-y divide-gray-200">
         {sectionA.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Section A</h2>
+            <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section A</h2>
             <Questionnaire questions={sectionA} />
           </div>
         )}
         {sectionB.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Section B</h2>
+            <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section B</h2>
             <Questionnaire questions={sectionB} />
           </div>
         )}
         {sectionC.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2">Section C</h2>
+            <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section C</h2>
             <Questionnaire questions={sectionC} />
           </div>
         )}
-      </>
+      </div>
     );
   }
 

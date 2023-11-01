@@ -111,11 +111,15 @@ const DashboardPage = () => {
     if (userType === "student") {
       return (
         <div className="flex flex-col overflow-x-hidden py-64">
-          <h2 className="font-bold text-2xl">School</h2>
-          <School
-            survey={schoolSurvey}
-            onSelect={() => setSelectedSubject("School")}
-          />
+          {!selectedSubject && (
+            <>
+              <h2 className="font-bold text-2xl">School</h2>
+              <School
+                survey={schoolSurvey}
+                onSelect={() => setSelectedSubject("School")}
+              />
+            </>
+          )}
 
           <h2 className="font-bold text-2xl">Academic</h2>
           {!selectedSubject && (

@@ -17,7 +17,7 @@ export const School = ({ survey, onSelect }) => {
 
   return (
     <ul role="list" className="divide-y divide-gray-200">
-      <li className="flex items-center justify-between gap-x-96 py-5">
+      <li className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5">
         <div className="min-w-0">
           <div className="flex flex-col items-start gap-x-3">
             <p className="text-sm font-semibold leading-6 text-gray-900">
@@ -31,7 +31,7 @@ export const School = ({ survey, onSelect }) => {
         </div>
         <div className="flex flex-none items-center gap-x-4">
           <button
-            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300"
             onClick={() => onSelect()}
             disabled={survey.every((question) => question.is_answered)}
           >

@@ -6,9 +6,16 @@ import {
   postParentAnswers,
   postStudentAnswers,
 } from "@/app/core/services/api/save";
+import { useRouter } from "next/navigation";
 
 const Questionnaire = ({ questions }) => {
-  const { register, handleSubmit, getValues } = useForm({ shouldUnregister: false });
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm({ shouldUnregister: false });
   const [user, setUser] = useState(() =>
     JSON.parse(sessionStorage.getItem("user"))
   );
@@ -56,8 +63,10 @@ const Questionnaire = ({ questions }) => {
 
     saveFunction(payload)
       .then((response) => {
-        if (response.success) {
+        if (response.status === 200 || response.status === 201) {
           setFeedbackMessage("Answers successfully saved!");
+          router.push('/success')
+
         } else {
           setFeedbackMessage(
             "There was an issue saving your answers. Please try again later."
@@ -74,7 +83,10 @@ const Questionnaire = ({ questions }) => {
 
   const renderQuestion = (question) => {
     return (
-      <div key={question.question_id} className="question-container flex flex-col justify-center space-y-4 mb-8">
+      <div
+        key={question.question_id}
+        className="question-container flex flex-col justify-center space-y-4 mb-8"
+      >
         <Question content={question.content} />
         <InputType
           type={question.type}
@@ -83,14 +95,24 @@ const Questionnaire = ({ questions }) => {
           register={register}
           name={question.question_id.toString()}
         />
+        {errors[question.question_id.toString()] && (
+          <p className="text-sm text-red-500">
+            {errors[question.question_id.toString()].message}
+          </p>
+        )}
       </div>
     );
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="questionnaire-container">
+    <form onSubmit={handleSubmit(onSubmit)} className="questionnaire-container p-8 sm:p-0">
       {questions.map(renderQuestion)}
-      <button type="submit" className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Submit</button>
+      <button
+        type="submit"
+        className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+      >
+        Submit
+      </button>
     </form>
   );
 };

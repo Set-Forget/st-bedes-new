@@ -19,8 +19,8 @@ export default function Home() {
 
   return (
     <main className="h-screen min-w-screen">
-      <Hero username={user} />
       <Navbar />
+      <Hero username={user} />
     </main>
   );
 }
