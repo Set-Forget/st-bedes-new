@@ -19,7 +19,7 @@ const Page = () => {
         height={0}
         width={1000}
         src={illustration}
-        className="absolute -bottom-8 -right-9 pointer-events-none"
+        className="absolute -bottom-8 -right-9 pointer-events-none lg:w-[40vw]"
       />
     </div>
   );

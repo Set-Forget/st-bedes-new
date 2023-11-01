@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Question from "./question";
 import InputType from "./inputType";
@@ -23,7 +23,8 @@ const Questionnaire = ({ questions }) => {
     setUser(storedUser || {});
   }, []);
 
-  const userType = user.student_id ? "student" : "parent";
+  const userType = user?.student_id ? "student" : "parent";
+  console.log("userType",userType);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   const parseOptions = (options) => {

@@ -68,7 +68,7 @@ const DashboardPage = () => {
           data = await getParentQuestion(userId);
         }
 
-        setSurveys(data.response.questions || []);
+        setSurveys(data && data.response ? data.response.questions || [] : []);
         setLoading(false);
       } catch (error) {
         setError(error.message);
