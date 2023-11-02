@@ -82,12 +82,6 @@ const DashboardPage = () => {
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
-  // console.log("surveys before using the useSurveyStatus:", surveys);
-  // console.log("pending surveys:", pendingSurveys);
-  // console.log("completed surveys:", completedSurveys);
-  // console.log("school survey", {schoolSurvey});
-  // console.log("school survey", schoolSurvey);
-
   useEffect(() => {
     if (selectedSubject === "School" && userType === "student") {
       router.push(`/dashboard/School-${userId}`);
@@ -128,8 +122,15 @@ const DashboardPage = () => {
 
           <h2 className="font-bold text-2xl">Academic</h2>
           {!selectedSubject && (
-            <Subjects surveys={academicSurveys} onSelect={setSelectedSubject} />
+            <>
+              {loading && <SpinnerBlack />}
+              <Subjects
+                surveys={academicSurveys}
+                onSelect={setSelectedSubject}
+              />
+            </>
           )}
+
           {selectedSubject && !selectedTeacher && (
             <>
               <Teachers

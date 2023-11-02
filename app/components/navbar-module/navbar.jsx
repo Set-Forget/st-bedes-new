@@ -51,10 +51,10 @@ const Navbar = () => {
               St. Bede&apos;s College
             </div>
             <div className="flex flex-col h-1/3 justify-between">
-              <Link href="/" className="text-2xl text-center">
+              <Link href="/" className="text-2xl text-center font-bold">
                 Home
               </Link>
-              <Link href="/dashboard" className="text-2xl text-center">
+              <Link href="/dashboard" className="text-2xl text-center font-bold">
                 Dashboard
               </Link>
               <button
@@ -67,7 +67,7 @@ const Navbar = () => {
           </div>
         </div>
         <button
-          className="fixed top-4 right-4 z-50 bg-bedeblue text-white p-2 rounded"
+          className="fixed top-4 right-4 z-50 bg-bedeblue text-white p-2 rounded-md"
           onClick={toggleSidebar}
         >
           Menu

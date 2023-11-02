@@ -111,12 +111,12 @@ const Questionnaire = ({ questions }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="questionnaire-container p-8 sm:p-0"
+      className="questionnaire-container px-8 py-16 sm:px-0 sm:py-0 flex flex-col"
     >
       {questions.map(renderQuestion)}
       <button
         type="submit"
-        className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+        className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 self-center"
       >
         Submit
       </button>
