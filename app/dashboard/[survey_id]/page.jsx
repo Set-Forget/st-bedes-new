@@ -10,6 +10,7 @@ import { useCategorizedQuestions } from "@/app/core/hooks/useCategorizedQuestion
 import { useFilterQuestions } from "@/app/core/hooks/useFilterQuestions";
 import SpinnerBlack from "@/app/components/spinner-component/spinnerBlack";
 import Navbar from "@/app/components/navbar-module/navbar";
+import { useRouter } from "next/navigation";
 
 const SurveyPage = () => {
   const isBrowser = typeof window !== "undefined";
@@ -20,11 +21,13 @@ const SurveyPage = () => {
     }
     return {};
   });
+  const router = useRouter();
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
   const { subject, teacher, child } = useDecodedSurveyId();
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState("A");
 
   useEffect(() => {
     async function fetchData() {
@@ -80,6 +83,33 @@ const SurveyPage = () => {
     filteredQuestions = [...sectionA, ...sectionB, ...sectionC];
   }
 
+  // handles parent user pagination, upon submit of the last section, push to /success page
+  const handleQuestionnaireSubmit = (section) => {
+    if (section === "A") {
+      setCurrentPage("B");
+    } else if (section === "B") {
+      setCurrentPage("C");
+    } else if (section === "C") {
+      router.push("/success");
+    }
+    window.scrollTo(0, 0)
+  };
+
+  let sectionQuestions;
+  if (currentPage === "A") {
+    sectionQuestions = sectionA;
+  } else if (currentPage === "B") {
+    sectionQuestions = sectionB;
+  } else if (currentPage === "C") {
+    sectionQuestions = sectionC;
+  }
+
+  const sectionTitles = {
+    A: "Safety, Welfare and Personal Development",
+    B: "The quality of education",
+    C: "Additional comments"
+  }
+
   // renders determined content based on type of user currently logged in
   let content;
 
@@ -94,27 +124,10 @@ const SurveyPage = () => {
     content = <Questionnaire questions={filteredQuestions} />;
   } else if (userType === "parent") {
     content = (
-      <div className="sm:py-64 pb-32 divide-y divide-gray-200">
-        {sectionA.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section A</h2>
-            <h3>Safety, Welfare and Personal Development</h3>
-            <Questionnaire questions={sectionA} />
-          </div>
-        )}
-        {sectionB.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section B</h2>
-            <h3>The quality of education</h3>
-            <Questionnaire questions={sectionB} />
-          </div>
-        )}
-        {sectionC.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section C</h2>
-            <Questionnaire questions={sectionC} />
-          </div>
-        )}
+      <div className="sm:py-64 pb-32">
+        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>Section {currentPage}</h2>
+        <h3 className="text-2xl mb-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
+        <Questionnaire questions={sectionQuestions} onSubmitSuccess={() => handleQuestionnaireSubmit(currentPage)} />
       </div>
     );
   }

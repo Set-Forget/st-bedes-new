@@ -11,7 +11,7 @@ const InputType = ({ type, options, register, name }) => {
       return (
         <textarea
           {...register(name)}
-          className="resize-none overflow-hidden transition-all block py-1.5 px-3 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-bedeblue sm:text-sm"
+          className="min-w-[600px] resize-none overflow-hidden transition-all block py-1.5 px-3 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-bedeblue sm:text-sm"
           onInput={resizeTextarea}
         />
       );
