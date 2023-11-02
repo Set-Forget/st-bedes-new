@@ -25,7 +25,6 @@ const DashboardPage = () => {
   const userType = user?.student_id ? "student" : "parent";
   const userId = user?.student_id || user?.parent_id;
 
-  console.log("user id:", userId);
   const router = useRouter();
 
   const [surveys, setSurveys] = useState([]);

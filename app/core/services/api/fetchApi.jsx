@@ -1,4 +1,5 @@
-const BASE_URL = "https://script.google.com/macros/s/AKfycbzOQ-TAlZ5No2x2Hr8x6yLViRbwRhIMvv4v7d3hQa0n8FYjZEBZPSci0vT74m5l-kYU2g/exec";
+const BASE_URL =
+  "https://script.google.com/macros/s/AKfycbzOQ-TAlZ5No2x2Hr8x6yLViRbwRhIMvv4v7d3hQa0n8FYjZEBZPSci0vT74m5l-kYU2g/exec";
 const PROXY_URL = "https://happy-mixed-gaura.glitch.me/";
 
 export const fetchApi = async (action, params = {}, method = "GET") => {
@@ -16,13 +17,13 @@ export const fetchApi = async (action, params = {}, method = "GET") => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-requested-with": "XMLHttpRequest"
+        "x-requested-with": "XMLHttpRequest",
       },
       body: JSON.stringify(params),
     };
   }
 
-  console.log(`Sending ${method} request to: ${url.toString()}`, requestOptions);
+  // console.log(`Sending ${method} request to: ${url.toString()}`, requestOptions);
 
   const response = await fetch(url.toString(), requestOptions);
   console.log("Raw Response:", response);

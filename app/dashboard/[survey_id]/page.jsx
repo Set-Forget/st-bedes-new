@@ -36,7 +36,7 @@ const SurveyPage = () => {
         data = await getParentQuestion(userId);
       }
 
-      console.log(`API Response for ${userType}:`, data);
+      // console.log(`API Response for ${userType}:`, data);
 
       if (data && data.response && data.response.questions) {
         setQuestions(data.response.questions);
@@ -66,7 +66,6 @@ const SurveyPage = () => {
       (question) =>
         question.student_id && question.student_id.toString() === child
     );
-    console.log("Parent Questions for Child:", childQuestions);
 
     sectionA = childQuestions.filter((question) =>
       question.section.startsWith("Section A")
@@ -117,9 +116,6 @@ const SurveyPage = () => {
       </div>
     );
   }
-
-  console.log("Rendered Content:", content);
-  console.log("Subject value:", subject);
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center items-center overscroll-x-hidden">

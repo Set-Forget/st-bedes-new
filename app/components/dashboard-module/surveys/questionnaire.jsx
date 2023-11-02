@@ -24,7 +24,6 @@ const Questionnaire = ({ questions }) => {
   }, []);
 
   const userType = user?.student_id ? "student" : "parent";
-  console.log("userType",userType);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
 
   const parseOptions = (options) => {
@@ -37,7 +36,6 @@ const Questionnaire = ({ questions }) => {
   };
 
   const onSubmit = (data) => {
-    console.log("Form values before transform:", getValues());
     const transformedData = questions.map((question) => ({
       row_number: question.row_number,
       student_id: question.student_id,
@@ -51,8 +49,6 @@ const Questionnaire = ({ questions }) => {
         }),
     }));
 
-    console.log("transformed data:", transformedData);
-
     // Depending on the userType, select the appropriate save function and action string
     const saveFunction =
       userType === "student" ? postStudentAnswers : postParentAnswers;
@@ -63,8 +59,6 @@ const Questionnaire = ({ questions }) => {
       action: actionString,
       data: transformedData,
     };
-
-    console.log("Payload to save:", payload);
 
     saveFunction(payload)
       .then((response) => {
