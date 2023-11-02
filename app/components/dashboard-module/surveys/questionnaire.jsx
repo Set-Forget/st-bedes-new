@@ -7,8 +7,9 @@ import {
   postStudentAnswers,
 } from "@/app/core/services/api/save";
 import { useRouter } from "next/navigation";
+import SimpleSpinner from "../../spinner-component/simpleSpinner";
 
-const Questionnaire = ({ questions }) => {
+const Questionnaire = ({ questions, onSubmitSuccess }) => {
   const router = useRouter();
   const {
     register,
@@ -25,6 +26,7 @@ const Questionnaire = ({ questions }) => {
 
   const userType = user?.student_id ? "student" : "parent";
   const [feedbackMessage, setFeedbackMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const parseOptions = (options) => {
     try {
@@ -36,6 +38,7 @@ const Questionnaire = ({ questions }) => {
   };
 
   const onSubmit = (data) => {
+    setLoading(true);
     const transformedData = questions.map((question) => ({
       row_number: question.row_number,
       student_id: question.student_id,
@@ -64,7 +67,7 @@ const Questionnaire = ({ questions }) => {
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
           setFeedbackMessage("Answers successfully saved!");
-          router.push("/success");
+          if (onSubmitSuccess) onSubmitSuccess();
         } else {
           setFeedbackMessage(
             "There was an issue saving your answers. Please try again later."
@@ -76,6 +79,9 @@ const Questionnaire = ({ questions }) => {
         setFeedbackMessage(
           "There was an error saving your answers. Please try again later."
         );
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -112,7 +118,7 @@ const Questionnaire = ({ questions }) => {
         type="submit"
         className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 self-center"
       >
-        Submit
+        {loading ? <SimpleSpinner /> : "Submit"}
       </button>
     </form>
   );
