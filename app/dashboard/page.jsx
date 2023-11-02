@@ -58,6 +58,7 @@ const DashboardPage = () => {
 
   // fetch all questions based on the type of user logged in
   useEffect(() => {
+    if (!userId) return;
     const fetchData = async () => {
       try {
         let data;
@@ -75,8 +76,9 @@ const DashboardPage = () => {
         console.error("dashboard fetch data error:", error);
       }
     };
-
-    fetchData();
+    if (userId && userType) {
+      fetchData();
+    }
   }, [userId, userType]);
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
@@ -91,13 +93,12 @@ const DashboardPage = () => {
       router.push(`/dashboard/${selectedChild.id}`);
     }
   }, [
-    userType,
     selectedTeacher,
     selectedSubject,
     selectedChild,
-    router,
-    userId,
   ]);
+
+  console.log("questions parent", allParentSurveys);
 
   // reset selection handler for simpler navigation
   const resetSubjectSelection = () => {
@@ -167,6 +168,8 @@ const DashboardPage = () => {
     selectedTeacher,
     uniqueChildren,
   ]);
+
+  console.log("userId", userId, "userType", userType);
 
   if (error) return <p>Oops, something unexpected happened: {error}</p>;
 

@@ -6,8 +6,8 @@ export const getStudentQuestion = async (studentId) => {
   });
 };
 
-export const getParentQuestion = async (studentId) => {
+export const getParentQuestion = async (parentId) => {
   return fetchApi("getParentQuestion", {
-    parentId: studentId,
+    parentId: parentId,
   });
 };

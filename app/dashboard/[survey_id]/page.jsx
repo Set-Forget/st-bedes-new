@@ -98,12 +98,14 @@ const SurveyPage = () => {
         {sectionA.length > 0 && (
           <div className="mb-4">
             <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section A</h2>
+            <h3>Safety, Welfare and Personal Development</h3>
             <Questionnaire questions={sectionA} />
           </div>
         )}
         {sectionB.length > 0 && (
           <div className="mb-4">
             <h2 className="text-xl font-semibold my-8 p-8 sm:p-0">Section B</h2>
+            <h3>The quality of education</h3>
             <Questionnaire questions={sectionB} />
           </div>
         )}
