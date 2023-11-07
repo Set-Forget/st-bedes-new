@@ -6,15 +6,12 @@ import {
   postParentAnswers,
   postStudentAnswers,
 } from "@/app/core/services/api/save";
-import { useRouter } from "next/navigation";
 import SimpleSpinner from "../../spinner-component/simpleSpinner";
 
 const Questionnaire = ({ questions, onSubmitSuccess }) => {
-  const router = useRouter();
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm({ shouldUnregister: false });
   const [user, setUser] = useState(null);

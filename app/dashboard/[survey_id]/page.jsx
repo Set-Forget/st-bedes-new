@@ -42,17 +42,28 @@ const SurveyPage = () => {
   }, [isBrowser, router]);
 
   useEffect(() => {
-    // Ensure that the userId from the session matches the userId in the URL
+    // ignore parent accounts
+    if (userType === 'parent') {
+      return;
+    }
+  
+    // splits url
+    const pathParts = window.location.pathname.split('/');
+  
+    if (pathParts[1] === 'dashboard' && pathParts.length === 3 && pathParts[2].includes('-')) {
+      return; // This URL is to be ignored for 'student' type
+    }
+  
+    // If userType is 'student', ensure the userId from the session matches the userId in the URL
     if (userType === 'student') {
-      const userIdFromUrl = window.location.pathname.split('-').pop();
+      const userIdFromUrl = pathParts[2]; // Assuming the user ID is the last part of the path
       if (userId.toString() !== userIdFromUrl) {
         alert('You do not have permission to view this survey.');
         router.push('/dashboard');
-      } else if (userType === 'parent') {
-        return;
       }
     }
-  }, [userId, router]);
+  }, [userId, userType, router]);
+  
 
 
   useEffect(() => {
@@ -121,6 +132,10 @@ const SurveyPage = () => {
     window.scrollTo(0, 0)
   };
 
+  const handleStudentQuestionnaireSubmit = () => {
+    router.push('/success')
+  }
+
   let sectionQuestions;
   if (currentPage === "A") {
     sectionQuestions = sectionA;
@@ -143,23 +158,23 @@ const SurveyPage = () => {
     content = (
       <div>
         <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>{`School Survey`}</h2>
-        <h3 className="text-2xl mb-8">Choose an option that best describes your feelings</h3>
-        <Questionnaire questions={schoolSurvey} />
+        <h3 className="text-2xl mb-8 p-8">Choose an option that best describes your feelings</h3>
+        <Questionnaire questions={schoolSurvey} onSubmitSuccess={() => handleStudentQuestionnaireSubmit()} />
       </div>
     );
   } else if (subject !== "School" && userType === "student") {
     content = (
       <div>
-        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>{`${teacher} - ${subject}`}</h2>
-        <h3 className="text-2xl mb-8">Choose an option that best describes your feelings</h3>
-        <Questionnaire questions={filteredQuestions} />
+        <h2 className={`text-4xl font-bold sm:my-8 p-8 sm:p-0`}>{`${teacher} - ${subject}`}</h2>
+        <h3 className="text-2xl sm:mb-8 p-8">Choose an option that best describes your feelings</h3>
+        <Questionnaire questions={filteredQuestions} onSubmitSuccess={() => handleStudentQuestionnaireSubmit()} />
       </div>
     )
   } else if (userType === "parent") {
     content = (
       <div className="sm:pt-16 pb-32">
         <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>Section {currentPage}</h2>
-        <h3 className="text-2xl mb-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
+        <h3 className="text-2xl sm:mb-8 p-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
         <Questionnaire questions={sectionQuestions} onSubmitSuccess={() => handleQuestionnaireSubmit(currentPage)} />
       </div>
     );
