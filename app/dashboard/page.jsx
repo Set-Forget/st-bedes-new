@@ -88,6 +88,13 @@ const DashboardPage = () => {
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
+  // survey completion percentage
+  const completionPercentage = useMemo(() => {
+    const totalSurveys = pendingSurveys.length + completedSurveys.length;
+    return totalSurveys > 0 ? (completedSurveys.length / totalSurveys) * 100 : 0;
+  }, [pendingSurveys, completedSurveys]);
+
+
   useEffect(() => {
     if (selectedSubject === "School" && userType === "student") {
       router.push(`/dashboard/School-${userId}`);
@@ -115,6 +122,16 @@ const DashboardPage = () => {
     if (userType === "student") {
       return (
         <div className="flex flex-col overflow-x-hidden py-64">
+
+          {/* progress bar */}
+          <div className="mb-8">
+            <p className="text-sm pb-2">Completion progress</p>
+            <div className="w-full rounded-full h-2.5 bg-gray-300">
+              <div className="h-2.5 rounded-full bg-gray-700" style={{ width: `${completionPercentage}%` }}></div>
+            </div>
+          </div>
+
+
           {!selectedSubject && (
             <>
               <h2 className="font-bold text-2xl">School</h2>

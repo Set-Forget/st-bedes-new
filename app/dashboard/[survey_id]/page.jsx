@@ -11,6 +11,7 @@ import { useFilterQuestions } from "@/app/core/hooks/useFilterQuestions";
 import SpinnerBlack from "@/app/components/spinner-component/spinnerBlack";
 import Navbar from "@/app/components/navbar-module/navbar";
 import { useRouter } from "next/navigation";
+import { Breadcrumbs } from "@/app/components/dashboard-module/ui/breadcrumbs";
 
 const SurveyPage = () => {
   const isBrowser = typeof window !== "undefined";
@@ -46,14 +47,14 @@ const SurveyPage = () => {
     if (userType === 'parent') {
       return;
     }
-  
+
     // splits url
     const pathParts = window.location.pathname.split('/');
-  
+
     if (pathParts[1] === 'dashboard' && pathParts.length === 3 && pathParts[2].includes('-')) {
       return; // This URL is to be ignored for 'student' type
     }
-  
+
     // If userType is 'student', ensure the userId from the session matches the userId in the URL
     if (userType === 'student') {
       const userIdFromUrl = pathParts[2]; // Assuming the user ID is the last part of the path
@@ -63,7 +64,7 @@ const SurveyPage = () => {
       }
     }
   }, [userId, userType, router]);
-  
+
 
 
   useEffect(() => {
@@ -172,9 +173,9 @@ const SurveyPage = () => {
     )
   } else if (userType === "parent") {
     content = (
-      <div className="sm:pt-16 pb-32">
-        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>Section {currentPage}</h2>
-        <h3 className="text-2xl sm:mb-8 p-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
+      <div>
+        <h2 className={`text-4xl font-bold sm:my-8 p-8 sm:p-0`}>Section {currentPage}</h2>
+        <h3 className="text-2xl sm:mb-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
         <Questionnaire questions={sectionQuestions} onSubmitSuccess={() => handleQuestionnaireSubmit(currentPage)} />
       </div>
     );
@@ -184,7 +185,11 @@ const SurveyPage = () => {
     <div className="relative min-h-screen flex flex-col justify-center items-center overscroll-x-hidden">
       <Navbar />
       {isLoading && <SpinnerBlack />}
-      {!isLoading && <div className="h-full mt-48">{content}</div>}
+      {!isLoading &&
+        <div className="h-full mt-48">
+          {userType === "parent" && <Breadcrumbs currentPage={currentPage} />}
+          {content}
+        </div>}
     </div>
   );
 };
