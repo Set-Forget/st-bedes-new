@@ -22,7 +22,7 @@ const SurveyPage = () => {
     }
     return {};
   });
-  
+
   const router = useRouter();
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
@@ -128,12 +128,19 @@ const SurveyPage = () => {
   if (subject === "School" && userType === "student") {
     content = (
       <div>
-        <h1>school survey</h1>
+        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>{`School Survey`}</h2>
+        <h3 className="text-2xl mb-8">Choose an option that best describes your feelings</h3>
         <Questionnaire questions={schoolSurvey} />
       </div>
     );
   } else if (subject !== "School" && userType === "student") {
-    content = <Questionnaire questions={filteredQuestions} />;
+    content = (
+      <div>
+        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>{`${teacher} - ${subject}`}</h2>
+        <h3 className="text-2xl mb-8">Choose an option that best describes your feelings</h3>
+        <Questionnaire questions={filteredQuestions} />
+      </div>
+    )
   } else if (userType === "parent") {
     content = (
       <div className="sm:pt-16 pb-32">
