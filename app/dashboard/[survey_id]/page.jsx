@@ -22,7 +22,7 @@ const SurveyPage = () => {
     }
     return {};
   });
-  
+
   const router = useRouter();
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
@@ -40,6 +40,34 @@ const SurveyPage = () => {
       }
     }
   }, [isBrowser, router]);
+
+  useEffect(() => {
+    // Ensure that the userId from the session matches the userId in the URL
+    if (userType === 'student') {
+      const userIdFromUrl = window.location.pathname.split('-').pop(); 
+      if (userId.toString() !== userIdFromUrl) {
+        alert('You do not have permission to view this survey.');
+        router.push('/dashboard');
+      }
+    } else if (userType === 'parent' && questions.length > 0) { 
+      // Retrieve child ID from the URL
+      const childIdFromUrl = window.location.pathname.split('/').pop(); 
+      
+      // Extract the children IDs from the questions array
+      const childrenIds = questions.map(q => q.student_id.toString());
+      console.log("children ids", childrenIds);
+      // Remove duplicate IDs if necessary
+      const uniqueChildrenIds = [...new Set(childrenIds)];
+      
+      // Check if the URL contains a valid child ID for this parent
+      if (!uniqueChildrenIds.includes(childIdFromUrl)) {
+        alert('You do not have permission to view this survey.');
+        router.push('/dashboard');
+      }
+    }
+  }, [userId, questions, router]); 
+  
+
 
   useEffect(() => {
     async function fetchData() {
@@ -128,12 +156,19 @@ const SurveyPage = () => {
   if (subject === "School" && userType === "student") {
     content = (
       <div>
-        <h1>school survey</h1>
+        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>{`School Survey`}</h2>
+        <h3 className="text-2xl mb-8">Choose an option that best describes your feelings</h3>
         <Questionnaire questions={schoolSurvey} />
       </div>
     );
   } else if (subject !== "School" && userType === "student") {
-    content = <Questionnaire questions={filteredQuestions} />;
+    content = (
+      <div>
+        <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>{`${teacher} - ${subject}`}</h2>
+        <h3 className="text-2xl mb-8">Choose an option that best describes your feelings</h3>
+        <Questionnaire questions={filteredQuestions} />
+      </div>
+    )
   } else if (userType === "parent") {
     content = (
       <div className="sm:pt-16 pb-32">
