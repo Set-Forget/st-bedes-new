@@ -19,7 +19,11 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
-    setUser(storedUser || {});
+    if (storedUser) {
+      setUser(storedUser || {});
+    } else {
+      router.push('/login')
+    }
   }, []);
 
   const userType = user?.student_id ? "student" : "parent";

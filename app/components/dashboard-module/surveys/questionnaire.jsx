@@ -17,7 +17,7 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
     getValues,
     formState: { errors },
   } = useForm({ shouldUnregister: false });
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
@@ -116,7 +116,7 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
       {questions.map(renderQuestion)}
       <button
         type="submit"
-        className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 self-center"
+        className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 self-center mb-16"
       >
         {loading ? <SimpleSpinner /> : "Submit"}
       </button>

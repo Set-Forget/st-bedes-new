@@ -17,10 +17,12 @@ const SurveyPage = () => {
 
   const [user, setUser] = useState(() => {
     if (isBrowser) {
-      return JSON.parse(sessionStorage.getItem("user"));
+      const storedUser = sessionStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : {};
     }
     return {};
   });
+  
   const router = useRouter();
   const userType = user.student_id ? "student" : "parent";
   const userId = user.student_id || user.parent_id;
@@ -28,6 +30,16 @@ const SurveyPage = () => {
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState("A");
+
+  useEffect(() => {
+    if (isBrowser) {
+      const storedUser = sessionStorage.getItem("user");
+      // ff there's no user in sessionStorage, redirect to the login page
+      if (!storedUser) {
+        router.push('/login');
+      }
+    }
+  }, [isBrowser, router]);
 
   useEffect(() => {
     async function fetchData() {
@@ -124,7 +136,7 @@ const SurveyPage = () => {
     content = <Questionnaire questions={filteredQuestions} />;
   } else if (userType === "parent") {
     content = (
-      <div className="sm:py-64 pb-32">
+      <div className="sm:pt-16 pb-32">
         <h2 className={`text-4xl font-bold my-8 p-8 sm:p-0`}>Section {currentPage}</h2>
         <h3 className="text-2xl mb-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
         <Questionnaire questions={sectionQuestions} onSubmitSuccess={() => handleQuestionnaireSubmit(currentPage)} />

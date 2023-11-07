@@ -17,9 +17,9 @@ const Page = () => {
       </Link>
       <Image
         height={0}
-        width={1000}
+        width={500}
         src={illustration}
-        className="absolute -bottom-16 sm:-bottom-8 -right-32 sm:-right-9 pointer-events-none lg:w-[40vw]"
+        className="absolute -bottom-16 sm:-bottom-8 -right-32 sm:-right-9 pointer-events-none lg:w-[40vw] sm:width-96"
       />
     </div>
   );
