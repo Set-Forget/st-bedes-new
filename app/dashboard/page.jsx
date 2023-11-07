@@ -16,6 +16,7 @@ import { School } from "../components/dashboard-module/ui/school";
 
 const DashboardPage = () => {
   const [user, setUser] = useState({});
+  console.log('user', user);
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));

@@ -42,6 +42,34 @@ const SurveyPage = () => {
   }, [isBrowser, router]);
 
   useEffect(() => {
+    // Ensure that the userId from the session matches the userId in the URL
+    if (userType === 'student') {
+      const userIdFromUrl = window.location.pathname.split('-').pop(); 
+      if (userId.toString() !== userIdFromUrl) {
+        alert('You do not have permission to view this survey.');
+        router.push('/dashboard');
+      }
+    } else if (userType === 'parent' && questions.length > 0) { 
+      // Retrieve child ID from the URL
+      const childIdFromUrl = window.location.pathname.split('/').pop(); 
+      
+      // Extract the children IDs from the questions array
+      const childrenIds = questions.map(q => q.student_id.toString());
+      console.log("children ids", childrenIds);
+      // Remove duplicate IDs if necessary
+      const uniqueChildrenIds = [...new Set(childrenIds)];
+      
+      // Check if the URL contains a valid child ID for this parent
+      if (!uniqueChildrenIds.includes(childIdFromUrl)) {
+        alert('You do not have permission to view this survey.');
+        router.push('/dashboard');
+      }
+    }
+  }, [userId, questions, router]); 
+  
+
+
+  useEffect(() => {
     async function fetchData() {
       let data;
 
