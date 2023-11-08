@@ -16,7 +16,6 @@ import { School } from "../components/dashboard-module/ui/school";
 
 const DashboardPage = () => {
   const [user, setUser] = useState({});
-  console.log('user', user);
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
@@ -94,6 +93,7 @@ const DashboardPage = () => {
     return totalSurveys > 0 ? (completedSurveys.length / totalSurveys) * 100 : 0;
   }, [pendingSurveys, completedSurveys]);
 
+  const uiPercentage = completionPercentage.toFixed(1);
 
   useEffect(() => {
     if (selectedSubject === "School" && userType === "student") {
@@ -110,8 +110,6 @@ const DashboardPage = () => {
     selectedChild,
   ]);
 
-  console.log("questions parent", allParentSurveys);
-
   // reset selection handler for simpler navigation
   const resetSubjectSelection = () => {
     setSelectedSubject(null);
@@ -121,13 +119,13 @@ const DashboardPage = () => {
   const content = useMemo(() => {
     if (userType === "student") {
       return (
-        <div className="flex flex-col overflow-x-hidden py-64">
+        <div className="flex flex-col overflow-x-hidden py-32">
 
           {/* progress bar */}
-          <div className="mb-8">
-            <p className="text-sm pb-2">Completion progress</p>
-            <div className="w-full rounded-full h-2.5 bg-gray-300">
-              <div className="h-2.5 rounded-full bg-gray-700" style={{ width: `${completionPercentage}%` }}></div>
+          <div className="mb-16">
+            <p className="text-xs pb-2">Completion progress {uiPercentage}%</p>
+            <div className="w-1/2 rounded-full h-2 bg-gray-300">
+              <div className="h-2 rounded-full bg-gray-700" style={{ width: `${completionPercentage}%` }}></div>
             </div>
           </div>
 
