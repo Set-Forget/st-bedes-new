@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   getStudentQuestion,
   getParentQuestion,
-} from "@/app/core/services/api/questions";
+} from "@/app/core/api/questions";
 import Questionnaire from "@/app/components/dashboard-module/surveys/questionnaire";
 import { useCategorizedQuestions } from "@/app/core/hooks/useCategorizedQuestions";
 import { useFilterQuestions } from "@/app/core/hooks/useFilterQuestions";

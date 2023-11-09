@@ -5,7 +5,7 @@ import InputType from "./inputType";
 import {
   postParentAnswers,
   postStudentAnswers,
-} from "@/app/core/services/api/save";
+} from "@/app/core/api/save";
 import SimpleSpinner from "../../spinner-component/simpleSpinner";
 
 const Questionnaire = ({ questions, onSubmitSuccess }) => {
