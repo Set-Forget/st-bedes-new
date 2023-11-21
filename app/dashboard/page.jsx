@@ -13,6 +13,7 @@ import Navbar from "../components/navbar-module/navbar";
 import SpinnerBlack from "../components/spinner-component/spinnerBlack";
 import useSurveyStatus from "../core/hooks/useSurveyStatus";
 import { School } from "../components/dashboard-module/ui/school";
+import { Toaster, toast } from 'sonner'
 
 const DashboardPage = () => {
   const [user, setUser] = useState({});
@@ -74,6 +75,7 @@ const DashboardPage = () => {
 
         setSurveys(data && data.response ? data.response.questions || [] : []);
         setLoading(false);
+        toast.info('Remember, all surveys are anonymous!');
       } catch (error) {
         setError(error.message);
         setLoading(false);
@@ -198,6 +200,7 @@ const DashboardPage = () => {
       <Navbar />
       {loading && <SpinnerBlack />}
       {!loading && <div className="content-container">{content}</div>}
+      <Toaster position="bottom-center"/>
     </div>
   );
 };
