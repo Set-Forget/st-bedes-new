@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import {
   authenticateParent,
   authenticateStudent,
-} from "@/app/core/services/api/auth";
+} from "@/app/core/api/auth";
 import useCheckLoginStatus from "@/app/core/hooks/useCheckLoginStatus";
 import { useRouter } from "next/navigation";
 import Image from "next/image";

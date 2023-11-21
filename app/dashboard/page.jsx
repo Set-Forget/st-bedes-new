@@ -6,7 +6,7 @@ import { Children } from "../components/dashboard-module/ui/children";
 import {
   getStudentQuestion,
   getParentQuestion,
-} from "@/app/core/services/api/questions";
+} from "@/app/core/api/questions";
 import { useRouter } from "next/navigation";
 import { useCategorizedQuestions } from "../core/hooks/useCategorizedQuestions";
 import Navbar from "../components/navbar-module/navbar";
