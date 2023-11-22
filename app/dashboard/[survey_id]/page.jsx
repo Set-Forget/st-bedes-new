@@ -189,7 +189,12 @@ const SurveyPage = () => {
       {isLoading && <SpinnerBlack />}
       {!isLoading &&
         <div className="h-full mt-48">
-          {userType === "parent" && <Breadcrumbs currentPage={currentPage} />}
+          {userType === "parent" && (
+            <div className="flex flex-col">
+              <p className="self-center">{localStorage.getItem("childName")}</p>
+              <Breadcrumbs currentPage={currentPage} />
+            </div>
+          )}
           {content}
         </div>}
     </div>

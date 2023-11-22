@@ -13,17 +13,18 @@ import Navbar from "../components/navbar-module/navbar";
 import SpinnerBlack from "../components/spinner-component/spinnerBlack";
 import useSurveyStatus from "../core/hooks/useSurveyStatus";
 import { School } from "../components/dashboard-module/ui/school";
-import { Toaster, toast } from 'sonner'
+import { Toaster, toast } from "sonner";
 
 const DashboardPage = () => {
   const [user, setUser] = useState({});
+  localStorage.clear("childName");
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser || {});
     } else {
-      router.push('/login')
+      router.push("/login");
     }
   }, []);
 
@@ -75,7 +76,7 @@ const DashboardPage = () => {
 
         setSurveys(data && data.response ? data.response.questions || [] : []);
         setLoading(false);
-        toast.info('Remember, all surveys are anonymous!');
+        toast.info("Remember, all surveys are anonymous!");
       } catch (error) {
         setError(error.message);
         setLoading(false);
@@ -92,7 +93,9 @@ const DashboardPage = () => {
   // survey completion percentage
   const completionPercentage = useMemo(() => {
     const totalSurveys = pendingSurveys.length + completedSurveys.length;
-    return totalSurveys > 0 ? (completedSurveys.length / totalSurveys) * 100 : 0;
+    return totalSurveys > 0
+      ? (completedSurveys.length / totalSurveys) * 100
+      : 0;
   }, [pendingSurveys, completedSurveys]);
 
   const uiPercentage = completionPercentage.toFixed(1);
@@ -104,13 +107,11 @@ const DashboardPage = () => {
       const surveyId = `${selectedSubject}-${selectedTeacher}`;
       router.push(`/dashboard/${surveyId}`);
     } else if (userType === "parent" && selectedChild) {
+      router.prefetch(`/dashboard/${selectedChild.id}`);
       router.push(`/dashboard/${selectedChild.id}`);
+      localStorage.setItem("childName", selectedChild.name);
     }
-  }, [
-    selectedTeacher,
-    selectedSubject,
-    selectedChild,
-  ]);
+  }, [selectedTeacher, selectedSubject, selectedChild]);
 
   // reset selection handler for simpler navigation
   const resetSubjectSelection = () => {
@@ -122,15 +123,16 @@ const DashboardPage = () => {
     if (userType === "student") {
       return (
         <div className="flex flex-col overflow-x-hidden py-32">
-
           {/* progress bar */}
           <div className="mb-16">
             <p className="text-xs pb-2">Completion progress {uiPercentage}%</p>
             <div className="w-1/2 rounded-full h-2 bg-gray-300">
-              <div className="h-2 rounded-full bg-gray-700" style={{ width: `${completionPercentage}%` }}></div>
+              <div
+                className="h-2 rounded-full bg-gray-700"
+                style={{ width: `${completionPercentage}%` }}
+              ></div>
             </div>
           </div>
-
 
           {!selectedSubject && (
             <>
@@ -200,7 +202,7 @@ const DashboardPage = () => {
       <Navbar />
       {loading && <SpinnerBlack />}
       {!loading && <div className="content-container">{content}</div>}
-      <Toaster position="bottom-center"/>
+      <Toaster position="bottom-center" />
     </div>
   );
 };
