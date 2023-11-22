@@ -108,7 +108,7 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="questionnaire-container px-8 py-16 sm:px-0 sm:py-0 flex flex-col"
+      className="questionnaire-container py-16 sm:px-0 sm:py-0 flex flex-col justify-center"
     >
       {questions.map(renderQuestion)}
       <button

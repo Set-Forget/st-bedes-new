@@ -55,7 +55,7 @@ const SurveyPage = () => {
       return; // This URL is to be ignored for 'student' type
     }
 
-    // If userType is 'student', ensure the userId from the session matches the userId in the URL
+    // ff userType is student, ensure the userId from the session matches the userId in the URL
     if (userType === 'student') {
       const userIdFromUrl = pathParts[2]; // Assuming the user ID is the last part of the path
       if (userId.toString() !== userIdFromUrl) {
@@ -166,23 +166,25 @@ const SurveyPage = () => {
   } else if (subject !== "School" && userType === "student") {
     content = (
       <div>
-        <h2 className={`text-4xl font-bold sm:my-8 p-8 sm:p-0`}>{`${teacher} - ${subject}`}</h2>
-        <h3 className="text-2xl sm:mb-8 p-8">Choose an option that best describes your feelings</h3>
+        <h2 className={`text-4xl font-bold sm:my-8 py-8`}>{`${teacher} - ${subject}`}</h2>
+        <h3 className="text-2xl sm:mb-8 font-semibold">Choose an option that best describes your feelings</h3>
         <Questionnaire questions={filteredQuestions} onSubmitSuccess={() => handleStudentQuestionnaireSubmit()} />
       </div>
     )
   } else if (userType === "parent") {
     content = (
-      <div>
-        <h2 className={`text-4xl font-bold sm:my-8 p-8 sm:p-0`}>Section {currentPage}</h2>
+      <div className="">
+        <h2 className={`text-4xl font-bold sm:my-8 py-8`}>Section {currentPage}</h2>
         <h3 className="text-2xl sm:mb-8 font-semibold underline">{sectionTitles[currentPage]}</h3>
-        <Questionnaire questions={sectionQuestions} onSubmitSuccess={() => handleQuestionnaireSubmit(currentPage)} />
+        <div className="self-center">
+          <Questionnaire questions={sectionQuestions} onSubmitSuccess={() => handleQuestionnaireSubmit(currentPage)} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-center items-center overscroll-x-hidden">
+    <div className="relative min-h-screen w-full flex flex-col justify-center items-center overscroll-x-hidden px-8">
       <Navbar />
       {isLoading && <SpinnerBlack />}
       {!isLoading &&
