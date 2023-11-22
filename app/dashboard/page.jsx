@@ -90,16 +90,42 @@ const DashboardPage = () => {
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
-  // survey completion percentage
-  const completionPercentage = useMemo(() => {
-    const totalSurveys = pendingSurveys.length + completedSurveys.length;
-    return totalSurveys > 0
-      ? (completedSurveys.length / totalSurveys) * 100
-      : 0;
-  }, [pendingSurveys, completedSurveys]);
+  // // survey completion percentage
+  // const completionPercentage = useMemo(() => {
+  //   const totalSurveys = pendingSurveys.length + completedSurveys.length;
+  //   return totalSurveys > 0
+  //     ? (completedSurveys.length / totalSurveys) * 100
+  //     : 0;
+  // }, [pendingSurveys, completedSurveys]);
 
-  const uiPercentage = completionPercentage.toFixed(1);
-
+  // groups questions by set id, for progress bar counter
+  const groupQuestionsBySetId = (questions) => {
+    return questions.reduce((acc, question) => {
+      const setId = question.set_id;
+      if (!acc[setId]) {
+        acc[setId] = [];
+      }
+      acc[setId].push(question);
+      return acc;
+    }, {});
+  };
+  
+  // Determine if a survey (group of questions) is completed
+  const isSurveyCompleted = (questions) => {
+    return questions.every(question => question.is_answered);
+  };
+  
+  // Group the surveys by set_id
+  const groupedSurveys = groupQuestionsBySetId(surveys);
+  
+  // Count completed and total surveys
+  const totalSurveysCount = Object.keys(groupedSurveys).length;
+  const completedSurveysCount = Object.values(groupedSurveys).filter(isSurveyCompleted).length;
+  
+  // Display text for the progress bar
+  const progressBarDisplay = `${completedSurveysCount}/${totalSurveysCount} surveys completed`;
+  
+  // handles routing to dynamic survey page depending on the user type and their selections
   useEffect(() => {
     if (selectedSubject === "School" && userType === "student") {
       router.push(`/dashboard/School-${userId}`);
@@ -125,11 +151,11 @@ const DashboardPage = () => {
         <div className="flex flex-col overflow-x-hidden py-32">
           {/* progress bar */}
           <div className="mb-16">
-            <p className="text-xs pb-2">Completion progress {uiPercentage}%</p>
+            <p className="text-xs pb-2">{progressBarDisplay}</p>
             <div className="w-1/2 rounded-full h-2 bg-gray-300">
               <div
                 className="h-2 rounded-full bg-gray-700"
-                style={{ width: `${completionPercentage}%` }}
+                style={{ width: `${(completedSurveysCount / totalSurveysCount) * 100}%` }}
               ></div>
             </div>
           </div>
@@ -191,6 +217,8 @@ const DashboardPage = () => {
     selectedSubject,
     selectedTeacher,
     uniqueChildren,
+    completedSurveysCount,
+    totalSurveysCount
   ]);
 
   console.log("userId", userId, "userType", userType);
