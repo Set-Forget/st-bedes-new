@@ -1,15 +1,15 @@
 "use client";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  authenticateParent,
-  authenticateStudent,
-} from "@/app/core/api/auth";
+import { authenticateParent, authenticateStudent } from "@/app/core/api/auth";
 import useCheckLoginStatus from "@/app/core/hooks/useCheckLoginStatus";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import errorPic from "@/public/error-page-illustration.svg";
 import Spinner from "../spinner-component/spinner";
+import GoogleAuth from "./google-auth";
+
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const LoginForm = () => {
   const {
@@ -100,90 +100,93 @@ const LoginForm = () => {
 
   return (
     <>
-      <div className="flex min-h-full w-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl leading-9 tracking-tight text-gray-900">
-            Sign in as a <b className="text-bedeblue">{loginType}</b>
-          </h2>
-        </div>
+      <GoogleOAuthProvider clientId="671620675244-049s7qtosnah6a3g4f2hi2sd71klfb47.apps.googleusercontent.com" scopes={['email']}>
+        <div className="flex min-h-full w-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+            <h2 className="mt-10 text-center text-2xl leading-9 tracking-tight text-gray-900">
+              Sign in as a <b className="text-bedeblue">{loginType}</b>
+            </h2>
+          </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Email address
-              </label>
-              <div className="mt-2">
-                <input
-                  type="email"
-                  {...register("email", { required: "Email is required." })}
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-bedeblue sm:text-sm sm:leading-6"
-                />
-              </div>
-              {errors.email && (
-                <p className="text-sm text-red-500 animate-pulse">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between">
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div>
                 <label
-                  htmlFor="password"
+                  htmlFor="email"
                   className="block text-sm font-medium leading-6 text-gray-900"
                 >
-                  Password
+                  Email address
                 </label>
+                <div className="mt-2">
+                  <input
+                    type="email"
+                    {...register("email", { required: "Email is required." })}
+                    className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-bedeblue sm:text-sm sm:leading-6"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-sm text-red-500 animate-pulse">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
-              <div className="mt-2">
-                <input
-                  type="password"
-                  {...register("password", {
-                    required: "Password is required.",
-                  })}
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-bedeblue sm:text-sm sm:leading-6"
-                />
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Password
+                  </label>
+                </div>
+                <div className="mt-2">
+                  <input
+                    type="password"
+                    {...register("password", {
+                      required: "Password is required.",
+                    })}
+                    className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-bedeblue sm:text-sm sm:leading-6"
+                  />
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-red-500 animate-pulse">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-sm text-red-500 animate-pulse">
-                  {errors.password.message}
-                </p>
+
+              {error && (
+                <p className="text-sm text-red-500 animate-pulse">{error}</p>
               )}
-            </div>
 
-            {error && (
-              <p className="text-sm text-red-500 animate-pulse">{error}</p>
-            )}
+              <div>
+                <button
+                  type="submit"
+                  className={`flex w-full justify-center rounded-md bg-bedeblue px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                    isLoading ? "cursor-wait opacity-90" : ""
+                  }`}
+                >
+                  {isLoading ? <Spinner /> : "Sign in"}
+                </button>
+                {loginType === "student" && <GoogleAuth />}
+              </div>
+            </form>
 
-            <div>
+            <p className="mt-10 text-center text-sm text-gray-500">
+              {`Im a ${loginType === "student" ? "parent" : "student"}. `}
               <button
-                type="submit"
-                className={`flex w-full justify-center rounded-md bg-bedeblue px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                  isLoading ? "cursor-wait opacity-90" : ""
+                onClick={toggleLoginType}
+                className={`font-semibold leading-6 text-bedeblue hover:text-blue-800 transition-colors ${
+                  isLoading ? "opacity-90 pointer-events-none" : ""
                 }`}
               >
-                {isLoading ? <Spinner /> : "Sign in"}
+                Switch role
               </button>
-            </div>
-          </form>
-
-          <p className="mt-10 text-center text-sm text-gray-500">
-            {`Im a ${loginType === "student" ? "parent" : "student"}. `}
-            <button
-              onClick={toggleLoginType}
-              className={`font-semibold leading-6 text-bedeblue hover:text-blue-800 transition-colors ${
-                isLoading ? "opacity-90 pointer-events-none" : ""
-              }`}
-            >
-              Switch role
-            </button>
-          </p>
+            </p>
+          </div>
         </div>
-      </div>
+      </GoogleOAuthProvider>
     </>
   );
 };
