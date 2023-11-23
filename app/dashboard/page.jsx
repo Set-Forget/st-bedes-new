@@ -17,16 +17,19 @@ import { Toaster, toast } from "sonner";
 
 const DashboardPage = () => {
   const [user, setUser] = useState({});
-  localStorage.clear("childName");
 
+  // checks if a user is logged in, if not, pushes him to /login page
   useEffect(() => {
-    const storedUser = JSON.parse(sessionStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser || {});
-    } else {
-      router.push("/login");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("childName");
+      const storedUser = JSON.parse(sessionStorage.getItem("user"));
+      if (storedUser) {
+        setUser(storedUser);
+      } else {
+        router.push("/login");
+      }
     }
-  }, []);
+  }, [router]);
 
   const userType = user?.student_id ? "student" : "parent";
   const userId = user?.student_id || user?.parent_id;
@@ -109,23 +112,24 @@ const DashboardPage = () => {
       return acc;
     }, {});
   };
-  
+
   // Determine if a survey (group of questions) is completed
   const isSurveyCompleted = (questions) => {
-    return questions.every(question => question.is_answered);
+    return questions.every((question) => question.is_answered);
   };
-  
+
   // Group the surveys by set_id
   const groupedSurveys = groupQuestionsBySetId(surveys);
-  
+
   // Count completed and total surveys
   const totalSurveysCount = Object.keys(groupedSurveys).length;
-  const completedSurveysCount = Object.values(groupedSurveys).filter(isSurveyCompleted).length;
-  
+  const completedSurveysCount =
+    Object.values(groupedSurveys).filter(isSurveyCompleted).length;
+
   // Display text for the progress bar
   const progressBarDisplay = `${completedSurveysCount}/${totalSurveysCount} surveys completed`;
-  
-  // handles routing to dynamic survey page depending on the user type and their selections
+
+  // handles routing to dynamic survey page depending on the user type and their selections - it may be listening to too many changes
   useEffect(() => {
     if (selectedSubject === "School" && userType === "student") {
       router.push(`/dashboard/School-${userId}`);
@@ -135,9 +139,11 @@ const DashboardPage = () => {
     } else if (userType === "parent" && selectedChild) {
       router.prefetch(`/dashboard/${selectedChild.id}`);
       router.push(`/dashboard/${selectedChild.id}`);
-      localStorage.setItem("childName", selectedChild.name);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("childName", selectedChild.name);
+      }
     }
-  }, [selectedTeacher, selectedSubject, selectedChild]);
+  }, [selectedTeacher, selectedSubject, selectedChild, userId]);
 
   // reset selection handler for simpler navigation
   const resetSubjectSelection = () => {
@@ -155,7 +161,11 @@ const DashboardPage = () => {
             <div className="w-1/2 rounded-full h-2 bg-gray-300">
               <div
                 className="h-2 rounded-full bg-gray-700"
-                style={{ width: `${(completedSurveysCount / totalSurveysCount) * 100}%` }}
+                style={{
+                  width: `${
+                    (completedSurveysCount / totalSurveysCount) * 100
+                  }%`,
+                }}
               ></div>
             </div>
           </div>
@@ -218,7 +228,7 @@ const DashboardPage = () => {
     selectedTeacher,
     uniqueChildren,
     completedSurveysCount,
-    totalSurveysCount
+    totalSurveysCount,
   ]);
 
   console.log("userId", userId, "userType", userType);
