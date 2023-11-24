@@ -17,7 +17,7 @@ import { Toaster, toast } from "sonner";
 
 const DashboardPage = () => {
   const [user, setUser] = useState({});
-  
+
   useEffect(() => {
     localStorage.removeItem("childName");
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
@@ -39,6 +39,8 @@ const DashboardPage = () => {
   const [selectedChild, setSelectedChild] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterType, setFilterType] = useState("all");
+  const [filteredSurveys, setFilteredSurveys] = useState([]);
 
   const categorizedQuestions = useCategorizedQuestions(surveys, userType);
   const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
@@ -90,14 +92,6 @@ const DashboardPage = () => {
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
-  // // survey completion percentage
-  // const completionPercentage = useMemo(() => {
-  //   const totalSurveys = pendingSurveys.length + completedSurveys.length;
-  //   return totalSurveys > 0
-  //     ? (completedSurveys.length / totalSurveys) * 100
-  //     : 0;
-  // }, [pendingSurveys, completedSurveys]);
-
   // groups questions by set id, for progress bar counter
   const groupQuestionsBySetId = (questions) => {
     return questions.reduce((acc, question) => {
@@ -109,22 +103,23 @@ const DashboardPage = () => {
       return acc;
     }, {});
   };
-  
+
   // Determine if a survey (group of questions) is completed
   const isSurveyCompleted = (questions) => {
-    return questions.every(question => question.is_answered);
+    return questions.every((question) => question.is_answered);
   };
-  
+
   // Group the surveys by set_id
   const groupedSurveys = groupQuestionsBySetId(surveys);
-  
+
   // Count completed and total surveys
   const totalSurveysCount = Object.keys(groupedSurveys).length;
-  const completedSurveysCount = Object.values(groupedSurveys).filter(isSurveyCompleted).length;
-  
+  const completedSurveysCount =
+    Object.values(groupedSurveys).filter(isSurveyCompleted).length;
+
   // Display text for the progress bar
   const progressBarDisplay = `${completedSurveysCount}/${totalSurveysCount} surveys completed`;
-  
+
   // handles routing to dynamic survey page depending on the user type and their selections
   useEffect(() => {
     if (selectedSubject === "School" && userType === "student") {
@@ -144,6 +139,23 @@ const DashboardPage = () => {
     setSelectedSubject(null);
     setSelectedTeacher(null);
   };
+
+  // filter the surveys by status (visually)
+  useEffect(() => {
+    // Apply filtering logic
+    let filtered;
+    if (filterType === "completed") {
+      filtered = surveys.filter((survey) => survey.is_answered);
+    } else if (filterType === "pending") {
+      filtered = surveys.filter((survey) => !survey.is_answered);
+    } else {
+      filtered = surveys; // For 'all' filter type
+    }
+
+    console.log("Filtered Surveys: ", filteredSurveys);
+    setFilteredSurveys(filtered);
+  }, [surveys, filterType]);
+
   // rendered content based on user type
   const content = useMemo(() => {
     if (userType === "student") {
@@ -155,8 +167,37 @@ const DashboardPage = () => {
             <div className="w-1/2 rounded-full h-2 bg-gray-300">
               <div
                 className="h-2 rounded-full bg-gray-700"
-                style={{ width: `${(completedSurveysCount / totalSurveysCount) * 100}%` }}
+                style={{
+                  width: `${
+                    (completedSurveysCount / totalSurveysCount) * 100
+                  }%`,
+                }}
               ></div>
+            </div>
+
+            <div className="flex space-x-2 text-xs mt-4">
+              <button
+                onClick={() => setFilterType("all")}
+                className={`text-xs ${filterType === "all" ? "font-bold" : ""}`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilterType("completed")}
+                className={`text-xs ${
+                  filterType === "completed" ? "font-bold" : ""
+                }`}
+              >
+                Completed
+              </button>
+              <button
+                onClick={() => setFilterType("pending")}
+                className={`text-xs ${
+                  filterType === "pending" ? "font-bold" : ""
+                }`}
+              >
+                Pending
+              </button>
             </div>
           </div>
 
@@ -175,7 +216,8 @@ const DashboardPage = () => {
             <>
               {loading && <SpinnerBlack />}
               <Subjects
-                surveys={academicSurveys}
+                key={filterType}
+                surveys={filteredSurveys}
                 onSelect={setSelectedSubject}
               />
             </>
@@ -218,10 +260,8 @@ const DashboardPage = () => {
     selectedTeacher,
     uniqueChildren,
     completedSurveysCount,
-    totalSurveysCount
+    totalSurveysCount,
   ]);
-
-  console.log("userId", userId, "userType", userType);
 
   if (error) return <p>Oops, something unexpected happened: {error}</p>;
 

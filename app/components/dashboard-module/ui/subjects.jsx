@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import useSurveyStatus from "@/app/core/hooks/useSurveyStatus";
 
 export const Subjects = ({ surveys, onSelect }) => {
-  const { completeSurveys } = useSurveyStatus(surveys);
   const [subjects, setSubjects] = useState([]);
 
   useEffect(() => {
@@ -10,6 +8,8 @@ export const Subjects = ({ surveys, onSelect }) => {
       const schoolSubjects = surveys.map((survey) => survey.subject_name);
       setSubjects([...new Set(schoolSubjects)]);
     }
+
+    console.log("Surveys in Subjects: ", surveys);
   }, [surveys]);
 
   const QUESTIONS_PER_TEACHER = 5;
@@ -18,9 +18,7 @@ export const Subjects = ({ surveys, onSelect }) => {
     const relatedSurveys = surveys.filter((s) => s.subject_name === subject);
     const completedSurveys = relatedSurveys.filter((s) => s.is_answered).length;
     const teacherCount = relatedSurveys.length / QUESTIONS_PER_TEACHER;
-    const completedTeachers = Math.ceil(
-      completedSurveys / QUESTIONS_PER_TEACHER
-    );
+    const completedTeachers = Math.ceil(completedSurveys / QUESTIONS_PER_TEACHER);
     return `${completedTeachers}/${teacherCount}`;
   };
 
@@ -32,10 +30,7 @@ export const Subjects = ({ surveys, onSelect }) => {
   return (
     <ul role="list" className="divide-y divide-gray-200">
       {subjects.map((subject, index) => (
-        <li
-          key={index}
-          className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5"
-        >
+        <li key={index} className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5">
           <div className="min-w-0">
             <div className="flex flex-col items-start gap-x-3">
               <p className="text-sm font-semibold leading-6 text-gray-900">
