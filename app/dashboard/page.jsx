@@ -144,8 +144,18 @@ const DashboardPage = () => {
     setSelectedSubject(null);
     setSelectedTeacher(null);
   };
-  // rendered content based on user type
+  // rendered content based on user type and survey presence
   const content = useMemo(() => {
+
+    if (surveys.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full">
+          <h2 className="text-xl font-semibold">No Surveys Available</h2>
+          <p className="text-gray-600">Check back later for new surveys.</p>
+        </div>
+      );
+    }
+
     if (userType === "student") {
       return (
         <div className="flex flex-col overflow-x-hidden py-32">
