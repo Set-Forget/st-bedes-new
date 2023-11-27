@@ -16,6 +16,11 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
   } = useForm({ shouldUnregister: false });
   const [user, setUser] = useState(null);
 
+  const hasMultipleTeachers = (questions) => {
+    const setIds = questions.map(q => q.set_id);
+    return new Set(setIds).size > 1;
+  };
+
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     setUser(storedUser || {});
@@ -41,25 +46,33 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
       student_id: question.student_id,
       question_id: question.question_id,
       answer: data[question.question_id.toString()],
-      // Include teacher_id and set_id only for academic surveys and if user is a student
+      // include teacher_id and set_id only for academic surveys and if user is a student
       ...(userType === "student" &&
         question.section !== "School" && {
           teacher_id: question.teacher_id,
           set_id: question.set_id,
         }),
     }));
-
+  
+    // does the subject have multiple teachers?
+    if (hasMultipleTeachers(questions)) {
+      // if so, save the subject to storage
+      const subjectName = questions[0]?.subject_name; 
+      sessionStorage.setItem('lastSubmittedSubject', subjectName);
+      console.log("Last submitted subject (set):", subjectName);
+    }
+  
     // Depending on the userType, select the appropriate save function and action string
     const saveFunction =
       userType === "student" ? postStudentAnswers : postParentAnswers;
     const actionString =
       userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
-
+  
     const payload = {
       action: actionString,
       data: transformedData,
     };
-
+  
     saveFunction(payload)
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
@@ -81,6 +94,7 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
         setLoading(false);
       });
   };
+  
 
   const renderQuestion = (question) => {
     return (

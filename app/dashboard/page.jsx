@@ -19,6 +19,16 @@ const DashboardPage = () => {
   const [user, setUser] = useState({});
 
   useEffect(() => {
+    const lastSubmittedSubject = sessionStorage.getItem('lastSubmittedSubject');
+    console.log("Last submitted subject (read):", lastSubmittedSubject); 
+
+    if (lastSubmittedSubject) {
+      setSelectedSubject(lastSubmittedSubject);
+      sessionStorage.removeItem('lastSubmittedSubject');
+    }
+  }, []);  
+
+  useEffect(() => {
     localStorage.removeItem("childName");
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     if (storedUser) {
