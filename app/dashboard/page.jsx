@@ -40,7 +40,6 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterType, setFilterType] = useState("all");
-  const [filteredSurveys, setFilteredSurveys] = useState([]);
 
   const categorizedQuestions = useCategorizedQuestions(surveys, userType);
   const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
@@ -140,75 +139,40 @@ const DashboardPage = () => {
     setSelectedTeacher(null);
   };
 
-  // filter the surveys by status (visually)
-  useEffect(() => {
-    // Apply filtering logic
-    let filtered;
-    if (filterType === "completed") {
-      filtered = surveys.filter((survey) => survey.is_answered);
-    } else if (filterType === "pending") {
-      filtered = surveys.filter((survey) => !survey.is_answered);
-    } else {
-      filtered = surveys; // For 'all' filter type
-    }
-
-    console.log("Filtered Surveys: ", filteredSurveys);
-    setFilteredSurveys(filtered);
-  }, [surveys, filterType]);
+  // checks if the school survey is completed, only for design purposes
+  const isSchoolSurveyCompleted = schoolSurvey.every(
+    (question) => question.is_answered
+  );
 
   // rendered content based on user type
   const content = useMemo(() => {
+    let displayedSurveys;
+    if (filterType === "completed") {
+      displayedSurveys = surveys.filter((survey) => survey.is_answered);
+    } else if (filterType === "pending") {
+      displayedSurveys = surveys.filter((survey) => !survey.is_answered);
+    } else {
+      displayedSurveys = surveys;
+    }
+
+    const showSchoolHeader =
+      filterType === "all" ||
+      (filterType === "completed" && isSchoolSurveyCompleted) ||
+      (filterType === "pending" && !isSchoolSurveyCompleted);
+
     if (userType === "student") {
       return (
         <div className="flex flex-col overflow-x-hidden py-32">
-          {/* progress bar */}
-          <div className="mb-16">
-            <p className="text-xs pb-2">{progressBarDisplay}</p>
-            <div className="w-1/2 rounded-full h-2 bg-gray-300">
-              <div
-                className="h-2 rounded-full bg-gray-700"
-                style={{
-                  width: `${
-                    (completedSurveysCount / totalSurveysCount) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
+          {userType === "student" && !selectedSubject && showSchoolHeader && (
+            <h2 className="font-bold text-2xl">School</h2>
+          )}
 
-            <div className="flex space-x-2 text-xs mt-4">
-              <button
-                onClick={() => setFilterType("all")}
-                className={`text-xs ${filterType === "all" ? "font-bold" : ""}`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setFilterType("completed")}
-                className={`text-xs ${
-                  filterType === "completed" ? "font-bold" : ""
-                }`}
-              >
-                Completed
-              </button>
-              <button
-                onClick={() => setFilterType("pending")}
-                className={`text-xs ${
-                  filterType === "pending" ? "font-bold" : ""
-                }`}
-              >
-                Pending
-              </button>
-            </div>
-          </div>
-
-          {!selectedSubject && (
-            <>
-              <h2 className="font-bold text-2xl">School</h2>
-              <School
-                survey={schoolSurvey}
-                onSelect={() => setSelectedSubject("School")}
-              />
-            </>
+          {userType === "student" && !selectedSubject && (
+            <School
+              survey={schoolSurvey}
+              onSelect={() => setSelectedSubject("School")}
+              filterType={filterType}
+            />
           )}
 
           <h2 className="font-bold text-2xl">Academic</h2>
@@ -216,9 +180,9 @@ const DashboardPage = () => {
             <>
               {loading && <SpinnerBlack />}
               <Subjects
-                key={filterType}
-                surveys={filteredSurveys}
+                surveys={displayedSurveys}
                 onSelect={setSelectedSubject}
+                filterType={filterType}
               />
             </>
           )}
@@ -254,22 +218,91 @@ const DashboardPage = () => {
       );
     }
   }, [
+    filterType,
+    surveys,
     userType,
-    academicSurveys,
     selectedSubject,
     selectedTeacher,
     uniqueChildren,
     completedSurveysCount,
     totalSurveysCount,
+    isSchoolSurveyCompleted,
   ]);
 
   if (error) return <p>Oops, something unexpected happened: {error}</p>;
 
   return (
-    <div className="relative flex flex-col justify-center items-center w-full min-h-screen overscroll-x-hidden">
+    <div className="relative w-full min-h-screen flex flex-col items-center overscroll-x-hidden">
       <Navbar />
-      {loading && <SpinnerBlack />}
-      {!loading && <div className="content-container">{content}</div>}
+      {loading && (
+        <div className="absolute top-0 left-0 flex justify-center items-center min-h-screen w-full">
+          <SpinnerBlack />
+        </div>
+      )}
+      {!loading && (
+        <>
+          <div className={`flex flex-col items-center w-full ${userType === "parent" ? 'pt-48' : ''}`}>
+            {userType === "student" && (
+              <div className=" top-0 w-4/5 sm:w-[548px] pt-48">
+              <div className="max-w-screen-lg mx-auto">
+                {/* progress bar */}
+                <div className="mb-4">
+                  <p className="text-xs">{progressBarDisplay}</p>
+                  <div className="w-full bg-gray-300 rounded-full h-2">
+                    <div
+                      className="bg-gray-700 h-2 rounded-full"
+                      style={{
+                        width: `${
+                          (completedSurveysCount / totalSurveysCount) * 100
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* filter buttons */}
+                <div className="flex space-x-2 text-xs">
+                  <button
+                    onClick={() => setFilterType("all")}
+                    className={`px-3 py-1 rounded ${
+                      filterType === "all"
+                        ? "bg-bedeblue text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setFilterType("completed")}
+                    className={`px-3 py-1 rounded ${
+                      filterType === "completed"
+                        ? "bg-bedeblue text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    Completed
+                  </button>
+                  <button
+                    onClick={() => setFilterType("pending")}
+                    className={`px-3 py-1 rounded ${
+                      filterType === "pending"
+                        ? "bg-bedeblue text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    Pending
+                  </button>
+                </div>
+              </div>
+            </div>
+            )}
+
+            <div className="flex flex-col w-full">
+              <div className="max-w-screen-lg mx-auto p-4">{content}</div>
+            </div>
+          </div>
+        </>
+      )}
       <Toaster position="bottom-center" />
     </div>
   );

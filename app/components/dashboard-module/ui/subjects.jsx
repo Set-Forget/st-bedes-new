@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from "react";
 
-export const Subjects = ({ surveys, onSelect }) => {
+export const Subjects = ({ surveys, onSelect, filterType }) => {
   const [subjects, setSubjects] = useState([]);
+
+  const isSubjectCompleted = (subjectName) => {
+    const relatedQuestions = surveys.filter(
+      (q) => q.subject_name === subjectName
+    );
+    return relatedQuestions.every((q) => q.is_answered);
+  };
 
   useEffect(() => {
     if (Array.isArray(surveys)) {
       const schoolSubjects = surveys.map((survey) => survey.subject_name);
-      setSubjects([...new Set(schoolSubjects)]);
-    }
+      const uniqueSubjects = [...new Set(schoolSubjects)];
 
-    console.log("Surveys in Subjects: ", surveys);
-  }, [surveys]);
+      // ff filterType is 'completed', only include subjects where all questions are answered
+      const filteredSubjects = uniqueSubjects.filter((subject) => {
+        return filterType !== "completed" || isSubjectCompleted(subject);
+      });
+
+      setSubjects(filteredSubjects);
+    }
+  }, [surveys, filterType]);
 
   const QUESTIONS_PER_TEACHER = 5;
 
@@ -18,7 +30,9 @@ export const Subjects = ({ surveys, onSelect }) => {
     const relatedSurveys = surveys.filter((s) => s.subject_name === subject);
     const completedSurveys = relatedSurveys.filter((s) => s.is_answered).length;
     const teacherCount = relatedSurveys.length / QUESTIONS_PER_TEACHER;
-    const completedTeachers = Math.ceil(completedSurveys / QUESTIONS_PER_TEACHER);
+    const completedTeachers = Math.ceil(
+      completedSurveys / QUESTIONS_PER_TEACHER
+    );
     return `${completedTeachers}/${teacherCount}`;
   };
 
@@ -30,7 +44,11 @@ export const Subjects = ({ surveys, onSelect }) => {
   return (
     <ul role="list" className="divide-y divide-gray-200">
       {subjects.map((subject, index) => (
-        <li key={index} className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5">
+        <li
+          key={index}
+          style={{ animationDelay: `${index * 0.125}s` }}
+          className="animate-fadeIn flex items-center justify-between sm:gap-x-96 gap-x-36 py-5 opacity-0"
+        >
           <div className="min-w-0">
             <div className="flex flex-col items-start gap-x-3">
               <p className="text-sm font-semibold leading-6 text-gray-900">
@@ -61,7 +79,8 @@ export const Subjects = ({ surveys, onSelect }) => {
           </div>
           <div className="flex flex-none items-center gap-x-4">
             <button
-              className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300"
+              className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset 
+              ring-gray-300  hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300"
               onClick={() => onSelect(subject)}
               disabled={isSubjectSurveyCompleted(subject)}
             >
