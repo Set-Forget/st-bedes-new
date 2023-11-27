@@ -26,7 +26,11 @@ export const Teachers = ({ subject, surveys, onSelect }) => {
   return (
     <ul role="list" className="divide-y divide-gray-200">
       {teachers.map((teacher, index) => (
-        <li key={index} className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5">
+        <li
+          key={index}
+          style={{ animationDelay: `${index * 0.125}s` }}
+          className="animate-fadeIn flex items-center justify-between sm:gap-x-96 gap-x-36 py-5 opacity-0"
+        >
           <div className="min-w-0">
             <div className="flex flex-col items-start gap-x-3">
               <p className="text-sm font-semibold leading-6 text-gray-900">{teacher}</p>

@@ -1,18 +1,20 @@
-export const School = ({ survey, onSelect }) => {
+export const School = ({ survey, onSelect, filterType }) => {
+  const isCompleted = survey.every((question) => question.is_answered);
+
+  // Render condition based on filter type
+  if (filterType === 'completed' && !isCompleted) return null;
+  if (filterType === 'pending' && isCompleted) return null;
+
   const getSurveyStatus = () => {
-    if (survey.every((question) => question.is_answered)) {
-      return (
-        <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
-          Completed
-        </span>
-      );
-    } else {
-      return (
-        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">
-          Pending
-        </span>
-      );
-    }
+    return isCompleted ? (
+      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+        Completed
+      </span>
+    ) : (
+      <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">
+        Pending
+      </span>
+    );
   };
 
   return (
