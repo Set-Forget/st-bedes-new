@@ -19,7 +19,7 @@ const Hero = ({ username }) => {
         <div className="pointer-events-none shape01 absolute bottom-96 left-96 sm:w-[20vw] sm:h-[20vw] w-48 h-48 bg-bedeyellow rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob"></div>
         <div className="pointer-events-none shape02 absolute top-48 left-48 sm:w-[25vw] sm:h-[25vw] w-48 h-48 bg-bedeblue rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob animation-delay-2000"></div>
         <svg
-          className="-z-10 absolute top-24 2xl:right-56 hidden sm:block"
+          className="-z-10 absolute -top-2 right-20 scale-50 2xl:top-0 2xl:right-20 3xl:scale-100 hidden sm:block"
           xmlns="http://www.w3.org/2000/svg"
           width="630"
           height="379"
