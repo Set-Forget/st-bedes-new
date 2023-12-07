@@ -15,7 +15,7 @@ export const Subjects = ({ surveys, onSelect, filterType }) => {
       const schoolSubjects = surveys.map((survey) => survey.subject_name);
       const uniqueSubjects = [...new Set(schoolSubjects)];
 
-      // ff filterType is 'completed', only include subjects where all questions are answered
+      // If filterType is 'completed', only include subjects where all questions are answered
       const filteredSubjects = uniqueSubjects.filter((subject) => {
         return filterType !== "completed" || isSubjectCompleted(subject);
       });
@@ -24,16 +24,35 @@ export const Subjects = ({ surveys, onSelect, filterType }) => {
     }
   }, [surveys, filterType]);
 
-  const QUESTIONS_PER_TEACHER = 5;
+  const calculateTeacherSurveys = (subject) => {
+    const relatedSurveys = surveys.filter(s => s.subject_name === subject);
+    const surveysByTeacher = relatedSurveys.reduce((acc, current) => {
+      const { teacher_id, is_answered } = current;
+      if (!acc[teacher_id]) {
+        acc[teacher_id] = {
+          completedQuestions: 0,
+          totalQuestions: 0
+        };
+      }
+      acc[teacher_id].totalQuestions += 1;
+      if (is_answered) {
+        acc[teacher_id].completedQuestions += 1;
+      }
+      return acc;
+    }, {});
+
+    const completedTeacherSurveys = Object.values(surveysByTeacher).filter(
+      teacher => teacher.completedQuestions === teacher.totalQuestions
+    ).length;
+
+    const totalTeachers = Object.keys(surveysByTeacher).length;
+
+    return { completedTeacherSurveys, totalTeachers };
+  };
 
   const countCompletedSurveys = (subject) => {
-    const relatedSurveys = surveys.filter((s) => s.subject_name === subject);
-    const completedSurveys = relatedSurveys.filter((s) => s.is_answered).length;
-    const teacherCount = relatedSurveys.length / QUESTIONS_PER_TEACHER;
-    const completedTeachers = Math.ceil(
-      completedSurveys / QUESTIONS_PER_TEACHER
-    );
-    return `${completedTeachers}/${teacherCount}`;
+    const { completedTeacherSurveys, totalTeachers } = calculateTeacherSurveys(subject);
+    return `${completedTeacherSurveys}/${totalTeachers}`;
   };
 
   const isSubjectSurveyCompleted = (subject) => {

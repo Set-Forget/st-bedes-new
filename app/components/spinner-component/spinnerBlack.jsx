@@ -14,7 +14,7 @@ const SpinnerBlack = () => {
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <Image height={24} width={24} src={ringSpinner}></Image>
+      <Image height={24} width={24} src={ringSpinner} alt="loading spinner"></Image>
       <div className="h-5">
         <p
           className={`${

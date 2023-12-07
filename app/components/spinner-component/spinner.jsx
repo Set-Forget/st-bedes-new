@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Spinner = () => {
   return (
-    <Image height={24} width={24} src={ringSpinner}></Image>
+    <Image height={24} width={24} src={ringSpinner} alt="loading spinner"></Image>
   );
 };
 

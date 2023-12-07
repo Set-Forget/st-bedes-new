@@ -6,7 +6,7 @@ const SimpleSpinner = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <Image height={24} width={24} src={ringSpinner}></Image>
+      <Image height={24} width={24} src={ringSpinner} alt="loading spinner"></Image>
     </div>
   );
 };
