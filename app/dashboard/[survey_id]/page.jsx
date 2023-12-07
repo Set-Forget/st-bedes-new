@@ -95,6 +95,7 @@ const SurveyPage = () => {
   const schoolSurvey = categorizedQuestions.studentSurveys.schoolSurvey;
   const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
   let filteredQuestions = useFilterQuestions(subject, teacher, academicSurveys);
+  const allQuestionsForSubject = questions.filter(q => q.subject_name === subject);
   let sectionA = [];
   let sectionB = [];
   let sectionC = [];
@@ -168,7 +169,7 @@ const SurveyPage = () => {
       <div>
         <h2 className={`text-4xl font-bold sm:my-8 py-8`}>{`${teacher} - ${subject}`}</h2>
         <h3 className="text-2xl sm:mb-8 font-semibold">Choose an option that best describes your feelings</h3>
-        <Questionnaire questions={filteredQuestions} onSubmitSuccess={() => handleStudentQuestionnaireSubmit()} />
+        <Questionnaire questions={filteredQuestions} onSubmitSuccess={() => handleStudentQuestionnaireSubmit()} allQuestionsForSubject={allQuestionsForSubject} />
       </div>
     )
   } else if (userType === "parent") {

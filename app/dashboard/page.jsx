@@ -18,15 +18,16 @@ import { Toaster, toast } from "sonner";
 const DashboardPage = () => {
   const [user, setUser] = useState({});
 
+  const lastSubmittedSubject = sessionStorage.getItem("lastSubmittedSubject");
+  console.log("Last submitted subject (outside useeffect):", lastSubmittedSubject);
   useEffect(() => {
-    const lastSubmittedSubject = sessionStorage.getItem("lastSubmittedSubject");
     console.log("Last submitted subject (read):", lastSubmittedSubject);
-
     if (lastSubmittedSubject) {
       setSelectedSubject(lastSubmittedSubject);
       sessionStorage.removeItem("lastSubmittedSubject");
+      console.log("Last submitted subject (inside if):", lastSubmittedSubject);
     }
-  }, []);
+  }, [lastSubmittedSubject]);
 
   useEffect(() => {
     localStorage.removeItem("childName");

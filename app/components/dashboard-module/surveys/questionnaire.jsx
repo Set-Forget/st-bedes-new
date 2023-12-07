@@ -8,7 +8,7 @@ import {
 } from "@/app/core/api/save";
 import SimpleSpinner from "../../spinner-component/simpleSpinner";
 
-const Questionnaire = ({ questions, onSubmitSuccess }) => {
+const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) => {
   const {
     register,
     handleSubmit,
@@ -17,9 +17,9 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
   const [user, setUser] = useState(null);
 
   const hasMultipleTeachers = (questions) => {
-    const setIds = questions.map(q => q.set_id);
-    return new Set(setIds).size > 1;
-  };
+    const teacherIds = questions.map(q => q.teacher_id);
+    return new Set(teacherIds).size > 1;
+  };  
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
@@ -55,7 +55,7 @@ const Questionnaire = ({ questions, onSubmitSuccess }) => {
     }));
   
     // does the subject have multiple teachers?
-    if (hasMultipleTeachers(questions)) {
+    if (hasMultipleTeachers(allQuestionsForSubject)) {
       // if so, save the subject to storage
       const subjectName = questions[0]?.subject_name; 
       sessionStorage.setItem('lastSubmittedSubject', subjectName);
