@@ -2,6 +2,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Spinner from "../spinner-component/spinner";
+import { Toaster, toast } from "sonner";
 
 const GoogleAuth = () => {
   const router = useRouter();
@@ -39,6 +40,7 @@ const GoogleAuth = () => {
               router.push("/");
             } else {
               console.error("User is not authorized or email is invalid");
+              toast.error("Your account is not on St Bede's Database");
             }
           } catch (error) {
             console.error("Error checking email:", error);
@@ -129,6 +131,7 @@ const GoogleAuth = () => {
           </>
         )}
       </a>
+      <Toaster position="bottom-center" />
     </div>
   );
 };

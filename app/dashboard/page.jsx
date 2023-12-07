@@ -19,14 +19,14 @@ const DashboardPage = () => {
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    const lastSubmittedSubject = sessionStorage.getItem('lastSubmittedSubject');
-    console.log("Last submitted subject (read):", lastSubmittedSubject); 
+    const lastSubmittedSubject = sessionStorage.getItem("lastSubmittedSubject");
+    console.log("Last submitted subject (read):", lastSubmittedSubject);
 
     if (lastSubmittedSubject) {
       setSelectedSubject(lastSubmittedSubject);
-      sessionStorage.removeItem('lastSubmittedSubject');
+      sessionStorage.removeItem("lastSubmittedSubject");
     }
-  }, []);  
+  }, []);
 
   useEffect(() => {
     localStorage.removeItem("childName");
@@ -154,6 +154,8 @@ const DashboardPage = () => {
     (question) => question.is_answered
   );
 
+  console.log("surveys", surveys);
+
   // rendered content based on user type
   const content = useMemo(() => {
     let displayedSurveys;
@@ -185,7 +187,7 @@ const DashboardPage = () => {
             />
           )}
 
-          <h2 className="font-bold text-2xl">Academic</h2>
+          <h2 className={`font-bold text-2xl ${selectedTeacher ? 'opacity-0' : 'opacity-100'}`}>Academic</h2>
           {!selectedSubject && (
             <>
               {loading && <SpinnerBlack />}
@@ -251,60 +253,66 @@ const DashboardPage = () => {
       )}
       {!loading && (
         <>
-          <div className={`flex flex-col items-center w-full ${userType === "parent" ? 'pt-48' : ''}`}>
+          <div
+            className={`flex flex-col items-center w-full ${
+              userType === "parent" ? "pt-48" : ""
+            }`}
+          >
             {userType === "student" && (
               <div className=" top-0 w-4/5 sm:w-[548px] pt-48">
-              <div className="max-w-screen-lg mx-auto">
-                {/* progress bar */}
-                <div className="mb-4">
-                  <p className="text-xs">{progressBarDisplay}</p>
-                  <div className="w-full bg-gray-300 rounded-full h-2">
-                    <div
-                      className="bg-gray-700 h-2 rounded-full"
-                      style={{
-                        width: `${
-                          (completedSurveysCount / totalSurveysCount) * 100
-                        }%`,
-                      }}
-                    ></div>
+                {!selectedSubject && (
+                  <div className="max-w-screen-lg mx-auto">
+                  {/* progress bar */}
+                  <div className="mb-4">
+                    <p className="text-xs">{progressBarDisplay}</p>
+                    <div className="w-full bg-gray-300 rounded-full h-2">
+                      <div
+                        className="bg-gray-700 h-2 rounded-full"
+                        style={{
+                          width: `${
+                            (completedSurveysCount / totalSurveysCount) * 100
+                          }%`,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  {/* filter buttons */}
+                  <div className="flex space-x-2 text-xs">
+                    <button
+                      onClick={() => setFilterType("all")}
+                      className={`px-3 py-1 rounded ${
+                        filterType === "all"
+                          ? "bg-bedeblue text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      onClick={() => setFilterType("completed")}
+                      className={`px-3 py-1 rounded ${
+                        filterType === "completed"
+                          ? "bg-bedeblue text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      Completed
+                    </button>
+                    <button
+                      onClick={() => setFilterType("pending")}
+                      className={`px-3 py-1 rounded ${
+                        filterType === "pending"
+                          ? "bg-bedeblue text-white"
+                          : "bg-gray-200"
+                      }`}
+                    >
+                      Pending
+                    </button>
                   </div>
                 </div>
-
-                {/* filter buttons */}
-                <div className="flex space-x-2 text-xs">
-                  <button
-                    onClick={() => setFilterType("all")}
-                    className={`px-3 py-1 rounded ${
-                      filterType === "all"
-                        ? "bg-bedeblue text-white"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setFilterType("completed")}
-                    className={`px-3 py-1 rounded ${
-                      filterType === "completed"
-                        ? "bg-bedeblue text-white"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    Completed
-                  </button>
-                  <button
-                    onClick={() => setFilterType("pending")}
-                    className={`px-3 py-1 rounded ${
-                      filterType === "pending"
-                        ? "bg-bedeblue text-white"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    Pending
-                  </button>
-                </div>
+                )}
               </div>
-            </div>
             )}
 
             <div className="flex flex-col w-full">
