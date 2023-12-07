@@ -18,17 +18,6 @@ import { Toaster, toast } from "sonner";
 const DashboardPage = () => {
   const [user, setUser] = useState({});
 
-  const lastSubmittedSubject = sessionStorage.getItem("lastSubmittedSubject");
-  console.log("Last submitted subject (outside useeffect):", lastSubmittedSubject);
-  useEffect(() => {
-    console.log("Last submitted subject (read):", lastSubmittedSubject);
-    if (lastSubmittedSubject) {
-      setSelectedSubject(lastSubmittedSubject);
-      sessionStorage.removeItem("lastSubmittedSubject");
-      console.log("Last submitted subject (inside if):", lastSubmittedSubject);
-    }
-  }, [lastSubmittedSubject]);
-
   useEffect(() => {
     localStorage.removeItem("childName");
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
@@ -38,6 +27,18 @@ const DashboardPage = () => {
       router.push("/login");
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const lastSubject = sessionStorage.getItem("lastSubmittedSubject");
+      console.log("Last submitted subject (outside useEffect):", lastSubject);
+      if (lastSubject) {
+        setSelectedSubject(lastSubject);
+        sessionStorage.removeItem("lastSubmittedSubject");
+        console.log("Last submitted subject (inside if):", lastSubject);
+      }
+    }
+  }, []);  
 
   const userType = user?.student_id ? "student" : "parent";
   const userId = user?.student_id || user?.parent_id;
