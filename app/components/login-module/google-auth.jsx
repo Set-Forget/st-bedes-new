@@ -10,7 +10,6 @@ const GoogleAuth = () => {
 
   const login = useGoogleLogin({
     onSuccess: async (response) => {
-      // Use the access token to fetch user information
       const userInfoResponse = await fetch(
         "https://www.googleapis.com/oauth2/v3/userinfo",
         {
@@ -26,10 +25,30 @@ const GoogleAuth = () => {
         const email = userInfo.email;
 
         if (email) {
-          // Now you have the email, you can use it with your API endpoint
-          const checkEmailUrl = `https://script.google.com/macros/s/AKfycbzOQ-TAlZ5No2x2Hr8x6yLViRbwRhIMvv4v7d3hQa0n8FYjZEBZPSci0vT74m5l-kYU2g/exec?action=checkValidStudentEmail&studentEmail=${email}`;
+          const cloudFunctionUrl = 'https://integrations.googleapis.com/v1/projects/st-bedes/locations/us-central1/integrations/RunAPI:execute';
+          const requestBody = {
+            "triggerId": "api_trigger/RunAPI_API_1",
+            "inputParameters": {
+              "postData": {
+                "jsonValue": JSON.stringify({
+                  "action": "checkValidStudentEmail",
+                  "data": { "studentEmail": email }
+                })
+              }
+            }
+          };
+
           try {
-            const emailCheckResponse = await fetch(checkEmailUrl);
+            const emailCheckResponse = await fetch(cloudFunctionUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                // Replace with dynamic token in production
+                "Authorization": "ya29.a0AfB_byBmepX3VjdOXl5M6qlNC0MA9z9jH4OWiWmZo77YyNoARjRbylg8clZenzRWRi-eoezqRCreJXu7z8p_0_iWEIYbHPLiVjv5H4alQDgzuZHg2YpREGS_D610AjO0SdCp4pWm3fJ7gh0keNNajb3VbiWfkoRVbqvWw_AmlQNOpXdKxLsaSyMDCT4rXacCLKImGyCt9wEDBBFQVRnHeW77DCLSxqbPMAIiaz2zWZaE-crrlaaAp4a9zuBDpGgYEwaLncg36UzubTP_6W7EE3-YVRJGegJEsof8o5GggkAY9d4Q_1OAMMYAoGeSoMw0MWEhaD8THAtVd98r_HqMWXx0D7LmyTB6Omsn9lO2qIrYslLZaNB90NxEfl30b_4bgGu8aOSSKqKB2a2NeNFgtCxkiQpblXIwjwaCgYKAaESARASFQHGX2Mi3sy23IsvvgcmpDC-dOAxYw0425"
+              },
+              body: JSON.stringify(requestBody)
+            });
+
             const emailCheckData = await emailCheckResponse.json();
 
             if (emailCheckData.status === 200) {
