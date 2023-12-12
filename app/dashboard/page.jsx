@@ -87,7 +87,10 @@ const DashboardPage = () => {
           data = await getParentQuestion(userId);
         }
 
-        setSurveys(data && data.response ? data.response.questions || [] : []);
+        // const parsedResponse = data ? JSON.parse(data.outputParameters.response) : null;
+        const parsedResponse = data && data.outputParameters ? JSON.parse(data.outputParameters.response) : null;
+
+        setSurveys(parsedResponse && parsedResponse.response ? parsedResponse.response.questions || [] : []);
         setLoading(false);
         toast.info("Remember, all surveys are anonymous!");
       } catch (error) {

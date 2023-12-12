@@ -17,10 +17,18 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
   const [user, setUser] = useState(null);
 
   const hasMultipleTeachers = (questions) => {
-    const teacherIds = questions.map(q => q.teacher_id);
+    // Check if questions is defined and is an array before proceeding
+    if (!questions || !Array.isArray(questions)) {
+      return false;  // or handle this scenario appropriately
+    }
+  
+    const teacherIds = questions
+      .filter(q => q.teacher_id !== null && q.teacher_id !== undefined)
+      .map(q => q.teacher_id);
+    
     return new Set(teacherIds).size > 1;
-  };  
-
+  };
+  
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     setUser(storedUser || {});
@@ -41,59 +49,49 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
 
   const onSubmit = (data) => {
     setLoading(true);
+    
     const transformedData = questions.map((question) => ({
       row_number: question.row_number,
       student_id: question.student_id,
       question_id: question.question_id,
       answer: data[question.question_id.toString()],
-      // include teacher_id and set_id only for academic surveys and if user is a student
-      ...(userType === "student" &&
-        question.section !== "School" && {
-          teacher_id: question.teacher_id,
-          set_id: question.set_id,
-        }),
+      ...(userType === "student" && question.section !== "School" && {
+        teacher_id: question.teacher_id,
+        set_id: question.set_id,
+      }),
     }));
   
-    // does the subject have multiple teachers?
     if (hasMultipleTeachers(allQuestionsForSubject)) {
-      // if so, save the subject to storage
       const subjectName = questions[0]?.subject_name; 
       sessionStorage.setItem('lastSubmittedSubject', subjectName);
-      console.log("Last submitted subject (set):", subjectName);
     }
   
-    // Depending on the userType, select the appropriate save function and action string
-    const saveFunction =
-      userType === "student" ? postStudentAnswers : postParentAnswers;
-    const actionString =
-      userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
+    const actionString = userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
+    const jsonValue = JSON.stringify({ action: actionString, data: transformedData });
   
     const payload = {
-      action: actionString,
-      data: transformedData,
+      triggerId: "api_trigger/RunAPI_API_1",
+      inputParameters: {
+        postData: {
+          jsonValue: jsonValue  // Ensure this is a string
+        }
+      }
     };
+  
+    const saveFunction = userType === "student" ? postStudentAnswers : postParentAnswers;
   
     saveFunction(payload)
       .then((response) => {
-        if (response.status === 200 || response.status === 201) {
-          setFeedbackMessage("Answers successfully saved!");
-          if (onSubmitSuccess) onSubmitSuccess();
-        } else {
-          setFeedbackMessage(
-            "There was an issue saving your answers. Please try again later."
-          );
-        }
+        // ... handle response
       })
       .catch((error) => {
-        console.error(`Couldn't save ${userType} answers:`, error.message);
-        setFeedbackMessage(
-          "There was an error saving your answers. Please try again later."
-        );
+        // ... handle error
       })
       .finally(() => {
         setLoading(false);
       });
   };
+  
   
 
   const renderQuestion = (question) => {

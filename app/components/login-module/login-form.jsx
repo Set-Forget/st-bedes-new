@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { authenticateParent, authenticateStudent } from "@/app/core/api/auth";
 import useCheckLoginStatus from "@/app/core/hooks/useCheckLoginStatus";
@@ -41,21 +41,27 @@ const LoginForm = () => {
       // wether its a student or parent, it uses a different api endpoint
       if (loginType === "student") {
         response = await authenticateStudent(email, password);
+        console.log("response in login form fetch", response);
       } else if (loginType === "parent") {
         response = await authenticateParent(email, password);
+        console.log("response in login form fetch", response);
       }
 
-      if (response && response.status === 200) {
-        sessionStorage.setItem("user", JSON.stringify(response.response));
+      const parsedResponse = response ? JSON.parse(response.outputParameters.response) : null;
+
+      if (parsedResponse && parsedResponse.status === 200) {
+        console.log('peepepeee', response.status);
+        sessionStorage.setItem("user", JSON.stringify(parsedResponse.response));
         router.push("/");
       } else if (
-        response &&
-        response.status === 404 &&
-        response.message === "Email not in the database."
+        parsedResponse &&
+        parsedResponse.status === 404 &&
+        parsedResponse.message === "Email not in the database."
       ) {
         setError("Email not found");
       } else {
         setError("Wrong credentials");
+        console.log("shit sent to the api", email, password);
       }
     } catch (error) {
       setError("An error occurred during login. Please try again.");
@@ -97,6 +103,21 @@ const LoginForm = () => {
       </div>
     );
   }
+
+  useEffect(() => {
+
+    const userString = sessionStorage.getItem("user");
+  
+
+    if (userString) {
+      const userData = JSON.parse(userString);
+      if (userData) {
+        setUser(userData.full_name);
+      }
+    } else {
+      console.log("no user data");
+    }
+  }, []);
 
   return (
     <>

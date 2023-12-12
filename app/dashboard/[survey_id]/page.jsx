@@ -78,9 +78,10 @@ const SurveyPage = () => {
       }
 
       // console.log(`API Response for ${userType}:`, data);
+      const parsedResponse = data && data.outputParameters ? JSON.parse(data.outputParameters.response) : null;
 
-      if (data && data.response && data.response.questions) {
-        setQuestions(data.response.questions);
+      if (parsedResponse && parsedResponse.response && parsedResponse.response.questions) {
+        setQuestions(parsedResponse.response.questions);
         setIsLoading(false);
       } else {
         console.error("unexpected data structure:", data);
