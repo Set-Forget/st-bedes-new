@@ -17,9 +17,17 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
   const [user, setUser] = useState(null);
 
   const hasMultipleTeachers = (questions) => {
-    const teacherIds = questions.map(q => q.teacher_id);
+    // Check if questions is defined and is an array before proceeding
+    if (!questions || !Array.isArray(questions)) {
+      return false;  // or handle this scenario appropriately
+    }
+  
+    const teacherIds = questions
+      .filter(q => q.teacher_id !== null && q.teacher_id !== undefined)
+      .map(q => q.teacher_id);
+    
     return new Set(teacherIds).size > 1;
-  };  
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
