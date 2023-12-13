@@ -72,10 +72,16 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
     
     saveFunction(actionString, transformedData)
       .then((response) => {
-        if (response.status === 200 || response.status === 201) {
+        console.log("API Response:", response);
+
+        const parsedResponse = JSON.parse(response.outputParameters.response);
+
+        if (parsedResponse.status === 200 || response.status === 201) {
+          console.log("Response status is 200 or 201", parsedResponse.status);
           setFeedbackMessage("Answers successfully saved!");
           if (onSubmitSuccess) onSubmitSuccess();
         } else {
+          console.log("Response status is not 200 or 201", parsedResponse.status);
           setFeedbackMessage("There was an issue saving your answers. Please try again later.");
         }
       })

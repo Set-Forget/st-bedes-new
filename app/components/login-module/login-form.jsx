@@ -61,7 +61,6 @@ const LoginForm = () => {
         setError("Email not found");
       } else {
         setError("Wrong credentials");
-        console.log("shit sent to the api", email, password);
       }
     } catch (error) {
       setError("An error occurred during login. Please try again.");

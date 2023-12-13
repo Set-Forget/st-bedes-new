@@ -45,3 +45,7 @@ form {
 .subtitle {
   text-wrap: balance;
 }
+
+.wrapped-title {
+  text-wrap: balance;
+}
