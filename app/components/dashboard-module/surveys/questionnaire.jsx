@@ -49,61 +49,46 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
 
   const onSubmit = (data) => {
     setLoading(true);
+    
     const transformedData = questions.map((question) => ({
       row_number: question.row_number,
       student_id: question.student_id,
       question_id: question.question_id,
       answer: data[question.question_id.toString()],
-      // include teacher_id and set_id only for academic surveys and if user is a student
-      ...(userType === "student" &&
-        question.section !== "School" && {
-          teacher_id: question.teacher_id,
-          set_id: question.set_id,
-        }),
+      ...(userType === "student" && question.section !== "School" && {
+        teacher_id: question.teacher_id,
+        set_id: question.set_id,
+      }),
     }));
-  
-    // does the subject have multiple teachers?
+    
     if (hasMultipleTeachers(allQuestionsForSubject)) {
-      // if so, save the subject to storage
       const subjectName = questions[0]?.subject_name; 
       sessionStorage.setItem('lastSubmittedSubject', subjectName);
-      console.log("Last submitted subject (set):", subjectName);
     }
-  
-    // Depending on the userType, select the appropriate save function and action string
-    const saveFunction =
-      userType === "student" ? postStudentAnswers : postParentAnswers;
-    const actionString =
-      userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
-  
-    const payload = {
-      action: actionString,
-      data: transformedData,
-    };
-  
-    saveFunction(payload)
+    
+    const actionString = userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
+    
+    const saveFunction = userType === "student" ? postStudentAnswers : postParentAnswers;
+    
+    saveFunction(actionString, transformedData)
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
           setFeedbackMessage("Answers successfully saved!");
           if (onSubmitSuccess) onSubmitSuccess();
         } else {
-          setFeedbackMessage(
-            "There was an issue saving your answers. Please try again later."
-          );
+          setFeedbackMessage("There was an issue saving your answers. Please try again later.");
         }
       })
       .catch((error) => {
-        console.error(`Couldn't save ${userType} answers:`, error.message);
-        setFeedbackMessage(
-          "There was an error saving your answers. Please try again later."
-        );
+        console.error(`Couldn't save ${userType} answers:`, error);
+        setFeedbackMessage("There was an error saving your answers. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
       });
   };
   
-
+  
   const renderQuestion = (question) => {
     return (
       <div
