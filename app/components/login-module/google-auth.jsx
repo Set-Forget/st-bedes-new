@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Spinner from "../spinner-component/spinner";
 import { Toaster, toast } from "sonner";
+import { fetchData } from "@/app/core/hooks/getBearer";
 
 const GoogleAuth = () => {
   const router = useRouter();
@@ -10,6 +11,8 @@ const GoogleAuth = () => {
 
   const login = useGoogleLogin({
     onSuccess: async (response) => {
+      let bearer = await fetchData();
+
       const userInfoResponse = await fetch(
         "https://www.googleapis.com/oauth2/v3/userinfo",
         {
@@ -44,7 +47,7 @@ const GoogleAuth = () => {
               headers: {
                 "Content-Type": "application/json",
                 // Replace with dynamic token in production
-                "Authorization": "ya29.a0AfB_byBmepX3VjdOXl5M6qlNC0MA9z9jH4OWiWmZo77YyNoARjRbylg8clZenzRWRi-eoezqRCreJXu7z8p_0_iWEIYbHPLiVjv5H4alQDgzuZHg2YpREGS_D610AjO0SdCp4pWm3fJ7gh0keNNajb3VbiWfkoRVbqvWw_AmlQNOpXdKxLsaSyMDCT4rXacCLKImGyCt9wEDBBFQVRnHeW77DCLSxqbPMAIiaz2zWZaE-crrlaaAp4a9zuBDpGgYEwaLncg36UzubTP_6W7EE3-YVRJGegJEsof8o5GggkAY9d4Q_1OAMMYAoGeSoMw0MWEhaD8THAtVd98r_HqMWXx0D7LmyTB6Omsn9lO2qIrYslLZaNB90NxEfl30b_4bgGu8aOSSKqKB2a2NeNFgtCxkiQpblXIwjwaCgYKAaESARASFQHGX2Mi3sy23IsvvgcmpDC-dOAxYw0425"
+                "Authorization": bearer
               },
               body: JSON.stringify(requestBody)
             });
