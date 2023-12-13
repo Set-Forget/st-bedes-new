@@ -28,7 +28,7 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
     
     return new Set(teacherIds).size > 1;
   };
-  
+
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     setUser(storedUser || {});
