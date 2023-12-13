@@ -50,7 +50,7 @@ const LoginForm = () => {
       const parsedResponse = response ? JSON.parse(response.outputParameters.response) : null;
 
       if (parsedResponse && parsedResponse.status === 200) {
-        console.log('peepepeee', response.status);
+        console.log('status', response.status);
         sessionStorage.setItem("user", JSON.stringify(parsedResponse.response));
         router.push("/");
       } else if (
