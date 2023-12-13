@@ -18,6 +18,21 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm();
 
+  useEffect(() => {
+
+    const userString = sessionStorage.getItem("user");
+  
+
+    if (userString) {
+      const userData = JSON.parse(userString);
+      if (userData) {
+        setUser(userData.full_name);
+      }
+    } else {
+      console.log("no user data");
+    }
+  }, []);
+
   const [loginType, setLoginType] = useState("student"); // login page defaults as student
   const [error, setError] = useState("");
   const isLoggedIn = useCheckLoginStatus();
@@ -102,21 +117,6 @@ const LoginForm = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-
-    const userString = sessionStorage.getItem("user");
-  
-
-    if (userString) {
-      const userData = JSON.parse(userString);
-      if (userData) {
-        setUser(userData.full_name);
-      }
-    } else {
-      console.log("no user data");
-    }
-  }, []);
 
   return (
     <>
