@@ -1,9 +1,10 @@
 import { fetchApi } from "./fetchApi";
 
-export const postStudentAnswers = (answers) => {
-    return fetchApi("SaveStudentAnswers", answers, "POST");
-};
+export const postStudentAnswers = (action, answers) => {
+    return fetchApi(action, answers);
+  };
   
-export const postParentAnswers = (answers) => {
-    return fetchApi("SaveParentAnswers", answers, "POST");
-};
+  export const postParentAnswers = (action, answers) => {
+    return fetchApi(action, answers);
+  };
+  

@@ -60,32 +60,28 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
         set_id: question.set_id,
       }),
     }));
-  
+    
     if (hasMultipleTeachers(allQuestionsForSubject)) {
       const subjectName = questions[0]?.subject_name; 
       sessionStorage.setItem('lastSubmittedSubject', subjectName);
     }
-  
+    
     const actionString = userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
-    const jsonValue = JSON.stringify({ action: actionString, data: transformedData });
-  
-    const payload = {
-      triggerId: "api_trigger/RunAPI_API_1",
-      inputParameters: {
-        postData: {
-          jsonValue: jsonValue  // Ensure this is a string
-        }
-      }
-    };
-  
+    
     const saveFunction = userType === "student" ? postStudentAnswers : postParentAnswers;
-  
-    saveFunction(payload)
+    
+    saveFunction(actionString, transformedData)
       .then((response) => {
-        // ... handle response
+        if (response.status === 200 || response.status === 201) {
+          setFeedbackMessage("Answers successfully saved!");
+          if (onSubmitSuccess) onSubmitSuccess();
+        } else {
+          setFeedbackMessage("There was an issue saving your answers. Please try again later.");
+        }
       })
       .catch((error) => {
-        // ... handle error
+        console.error(`Couldn't save ${userType} answers:`, error);
+        setFeedbackMessage("There was an error saving your answers. Please try again later.");
       })
       .finally(() => {
         setLoading(false);
@@ -93,7 +89,6 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
   };
   
   
-
   const renderQuestion = (question) => {
     return (
       <div
