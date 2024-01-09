@@ -1,49 +1,43 @@
-import { useState } from "react";
-import { fetchData } from "../hooks/getBearer";
+const BASE_URL = "https://europe-west2-st-bedes.cloudfunctions.net/st-bedes-deploy-test";
+const PROXY_URL = "https://happy-mixed-gaura.glitch.me/"
 
-const PROXY_URL = "https://happy-mixed-gaura.glitch.me/";
-const CLOUD_FUNCTION_URL =
-  "https://integrations.googleapis.com/v1/projects/st-bedes/locations/us-central1/integrations/RunAPI:execute";
-
-export const fetchApi = async (action, data = {}) => {
-
-  let bearer = await fetchData();
-  const bearerString = JSON.stringify(bearer)
-
-  const requestBody = {
-    "triggerId": "api_trigger/RunAPI_API_1",
-    "inputParameters": {
-      "postData": {
-        "jsonValue": JSON.stringify({
-          "action": action,
-          "data": data
-        })
-      }
-    }
-  };
+export const fetchApi = async (action, data = {}, method = "GET") => {
+  let url = `${PROXY_URL}${BASE_URL}?action=${action}`;
 
   const requestOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      // Replace with dynamic token in production
-      "Authorization": `Bearer ${bearer}`
-    },
-    body: JSON.stringify(requestBody)
+    method: method,
+    headers: {}
   };
 
-  const response = await fetch(CLOUD_FUNCTION_URL, requestOptions);
-  console.log("Raw Response:", response);
-
-  if (!response.ok) {
-    throw new Error(`HTTP error, status: ${response.status}`);
+  if (method === "POST") {
+    requestOptions.headers["Content-Type"] = "application/json";
+    requestOptions.body = JSON.stringify(data);
+  } else if (method === "GET" && data) {
+    // Append data as query parameters for GET request
+    const queryParams = new URLSearchParams(data).toString();
+    url += `&${queryParams}`;
   }
 
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    const responseData = await response.text();
-    return JSON.parse(responseData);
-  } else {
-    throw new Error("Unexpected content type received.");
+  try {
+    const response = await fetch(url, requestOptions);
+    console.log("Raw Response:", response);
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('HTTP Error Response Body:', errorBody);
+      throw new Error(`HTTP error, status: ${response.status}`);
+    }
+
+    try {
+      const responseData = await response.json();
+      return responseData;
+    } catch (jsonError) {
+      const rawResponse = await response.text();
+      console.error('Failed to parse response as JSON. Raw Response Body:', rawResponse);
+      throw new Error("Failed to parse response as JSON.");
+    }
+  } catch (error) {
+    console.error("Fetch Error:", error.message);
+    throw error; 
   }
 };

@@ -2,12 +2,12 @@ import { fetchApi } from "./fetchApi";
 
 export const getStudentQuestion = async (studentId) => {
   return fetchApi("getStudentQuestion", {
-    studentId: studentId,
-  });
+    studentId: studentId
+  }, "GET");
 };
 
 export const getParentQuestion = async (parentId) => {
   return fetchApi("getParentQuestion", {
-    parentId: parentId,
-  });
+    parentId: parentId
+  }, "GET");
 };

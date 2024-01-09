@@ -70,27 +70,25 @@ const SurveyPage = () => {
   useEffect(() => {
     async function fetchData() {
       let data;
-
+  
       if (userType === "student") {
         data = await getStudentQuestion(userId);
       } else if (userType === "parent") {
         data = await getParentQuestion(userId);
       }
 
-      // console.log(`API Response for ${userType}:`, data);
-      const parsedResponse = data && data.outputParameters ? JSON.parse(data.outputParameters.response) : null;
-
-      if (parsedResponse && parsedResponse.response && parsedResponse.response.questions) {
-        setQuestions(parsedResponse.response.questions);
-        setIsLoading(false);
+      if (data && data.status === 200 && data.response && data.response.questions) {
+        setQuestions(data.response.questions);
+        console.log("Questions set:", data.response.questions); 
       } else {
         console.error("unexpected data structure:", data);
-        setIsLoading(false);
       }
+      setIsLoading(false);
     }
-
+  
     fetchData();
   }, [userId, userType]);
+  
 
   const categorizedQuestions = useCategorizedQuestions(questions, userType);
   const schoolSurvey = categorizedQuestions.studentSurveys.schoolSurvey;

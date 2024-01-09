@@ -44,46 +44,46 @@ const LoginForm = () => {
   const onSubmit = async ({ email, password }) => {
     setError("");
     setIsLoading(true);
-
+  
     if (!email.trim() || !password.trim()) {
       setError("Please complete all fields.");
       setIsLoading(false);
       return;
     }
+    
     try {
       let response;
-
-      // wether its a student or parent, it uses a different api endpoint
+  
+      // Whether it's a student or parent, it uses a different API endpoint
       if (loginType === "student") {
         response = await authenticateStudent(email, password);
-        console.log("response in login form fetch", response);
       } else if (loginType === "parent") {
         response = await authenticateParent(email, password);
-        console.log("response in login form fetch", response);
       }
-
-      const parsedResponse = response ? JSON.parse(response.outputParameters.response) : null;
-
-      if (parsedResponse && parsedResponse.status === 200) {
-        console.log('status', response.status);
-        sessionStorage.setItem("user", JSON.stringify(parsedResponse.response));
+  
+      console.log("response in login form fetch", response);
+  
+      // Assuming the response has the following structure: { status: 200, response: { ... } }
+      if (response && response.status === 200) {
+        sessionStorage.setItem("user", JSON.stringify(response.response));
         router.push("/");
       } else if (
-        parsedResponse &&
-        parsedResponse.status === 404 &&
-        parsedResponse.message === "Email not in the database."
+        response &&
+        response.status === 404 &&
+        response.message === "Email not in the database."
       ) {
         setError("Email not found");
       } else {
         setError("Wrong credentials");
       }
     } catch (error) {
+      console.error(error); // Log the error for better debugging
       setError("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   // toggle wether its a parent or a student (default) login in
   const toggleLoginType = () => {
     if (loginType === "student") {

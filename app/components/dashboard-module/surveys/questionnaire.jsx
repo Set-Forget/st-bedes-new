@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Question from "./question";
 import InputType from "./inputType";
-import {
-  postParentAnswers,
-  postStudentAnswers,
-} from "@/app/core/api/save";
+import { postParentAnswers, postStudentAnswers } from "@/app/core/api/save";
 import SimpleSpinner from "../../spinner-component/simpleSpinner";
 
-const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) => {
+const Questionnaire = ({
+  questions,
+  onSubmitSuccess,
+  allQuestionsForSubject,
+}) => {
   const {
     register,
     handleSubmit,
@@ -19,13 +20,13 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
   const hasMultipleTeachers = (questions) => {
     // Check if questions is defined and is an array before proceeding
     if (!questions || !Array.isArray(questions)) {
-      return false;  // or handle this scenario appropriately
+      return false; // or handle this scenario appropriately
     }
-  
+
     const teacherIds = questions
-      .filter(q => q.teacher_id !== null && q.teacher_id !== undefined)
-      .map(q => q.teacher_id);
-    
+      .filter((q) => q.teacher_id !== null && q.teacher_id !== undefined)
+      .map((q) => q.teacher_id);
+
     return new Set(teacherIds).size > 1;
   };
 
@@ -49,39 +50,31 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
 
   const onSubmit = (data) => {
     setLoading(true);
-    
-    const transformedData = questions.map((question) => ({
+  
+    const answers = questions.map((question) => ({
       row_number: question.row_number,
       student_id: question.student_id,
       question_id: question.question_id,
+      set_id: question.set_id, // include only if you have the data
+      teacher_id: question.teacher_id, // include only if you have the data
       answer: data[question.question_id.toString()],
-      ...(userType === "student" && question.section !== "School" && {
-        teacher_id: question.teacher_id,
-        set_id: question.set_id,
-      }),
     }));
-    
-    if (hasMultipleTeachers(allQuestionsForSubject)) {
-      const subjectName = questions[0]?.subject_name; 
-      sessionStorage.setItem('lastSubmittedSubject', subjectName);
-    }
-    
-    const actionString = userType === "student" ? "saveStudentAnswers" : "saveParentAnswers";
-    
+  
+    // Prepare the payload as expected by the server
+    const payload = {
+      action: userType === "student" ? "saveStudentAnswers" : "saveParentAnswers",
+      data: answers, // This is the array of answers
+    };
+  
+    // Select the appropriate API function based on the user type
     const saveFunction = userType === "student" ? postStudentAnswers : postParentAnswers;
-    
-    saveFunction(actionString, transformedData)
+  
+    saveFunction(payload.action, payload)
       .then((response) => {
-        console.log("API Response:", response);
-
-        const parsedResponse = JSON.parse(response.outputParameters.response);
-
-        if (parsedResponse.status === 200 || response.status === 201) {
-          console.log("Response status is 200 or 201", parsedResponse.status);
+        if (response.status === 200 || response.status === 201) {
           setFeedbackMessage("Answers successfully saved!");
           if (onSubmitSuccess) onSubmitSuccess();
         } else {
-          console.log("Response status is not 200 or 201", parsedResponse.status);
           setFeedbackMessage("There was an issue saving your answers. Please try again later.");
         }
       })
@@ -95,6 +88,7 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
   };
   
   
+
   const renderQuestion = (question) => {
     return (
       <div
@@ -104,7 +98,6 @@ const Questionnaire = ({ questions, onSubmitSuccess, allQuestionsForSubject }) =
         <Question content={question.content} />
         <InputType
           type={question.type}
-          // avoid trying to parse null options (text field input)
           options={question.options ? parseOptions(question.options) : []}
           register={register}
           name={question.question_id.toString()}

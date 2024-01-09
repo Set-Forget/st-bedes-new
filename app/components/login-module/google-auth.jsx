@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Spinner from "../spinner-component/spinner";
 import { Toaster, toast } from "sonner";
-import { fetchData } from "@/app/core/hooks/getBearer";
+import { fetchApi } from "@/app/core/api/fetchApi";
 
 const GoogleAuth = () => {
   const router = useRouter();
@@ -11,7 +11,7 @@ const GoogleAuth = () => {
 
   const login = useGoogleLogin({
     onSuccess: async (response) => {
-      let bearer = await fetchData();
+      setIsLoading(true);
 
       const userInfoResponse = await fetch(
         "https://www.googleapis.com/oauth2/v3/userinfo",
@@ -23,41 +23,22 @@ const GoogleAuth = () => {
       );
 
       if (userInfoResponse.ok) {
-        setIsLoading(true);
         const userInfo = await userInfoResponse.json();
         const email = userInfo.email;
 
         if (email) {
-          const cloudFunctionUrl = 'https://integrations.googleapis.com/v1/projects/st-bedes/locations/us-central1/integrations/RunAPI:execute';
-          const requestBody = {
-            "triggerId": "api_trigger/RunAPI_API_1",
-            "inputParameters": {
-              "postData": {
-                "jsonValue": JSON.stringify({
-                  "action": "checkValidStudentEmail",
-                  "data": { "studentEmail": email }
-                })
-              }
-            }
-          };
-
+          const action = "checkValidEmail";
           try {
-            const emailCheckResponse = await fetch(cloudFunctionUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                // Replace with dynamic token in production
-                "Authorization": bearer
-              },
-              body: JSON.stringify(requestBody)
-            });
+            const emailCheckResponse = await fetchApi(
+              action,
+              { studentEmail: encodeURIComponent(email) },
+              "GET"
+            );
 
-            const emailCheckData = await emailCheckResponse.json();
-
-            if (emailCheckData.status === 200) {
+            if (emailCheckResponse.status === 200) {
               sessionStorage.setItem(
                 "user",
-                JSON.stringify(emailCheckData.response)
+                JSON.stringify(emailCheckResponse.response)
               );
               router.push("/");
             } else {
@@ -66,17 +47,24 @@ const GoogleAuth = () => {
             }
           } catch (error) {
             console.error("Error checking email:", error);
+            toast.error("An error occurred during login. Please try again.");
           } finally {
             setIsLoading(false);
           }
         } else {
           console.error("Email not found in user info response");
+          toast.error("An error occurred during login. Please try again.");
         }
       } else {
         console.error("Failed to fetch user info");
+        toast.error("An error occurred during login. Please try again.");
       }
     },
-    onError: (error) => console.error(`Login Failed: ${error}`),
+    onError: (error) => {
+      console.error(`Login Failed: ${error}`);
+      toast.error("Login failed. Please try again.");
+    },
+    scope: "email",
   });
 
   return (

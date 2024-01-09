@@ -78,31 +78,42 @@ const DashboardPage = () => {
   // fetch all questions based on the type of user logged in
   useEffect(() => {
     if (!userId) return;
+  
     const fetchData = async () => {
       try {
-        let data;
+        setLoading(true);
+        let response;
+  
         if (userType === "student") {
-          data = await getStudentQuestion(userId);
+          response = await getStudentQuestion(userId);
         } else if (userType === "parent") {
-          data = await getParentQuestion(userId);
+          response = await getParentQuestion(userId);
         }
-
-        // const parsedResponse = data ? JSON.parse(data.outputParameters.response) : null;
-        const parsedResponse = data && data.outputParameters ? JSON.parse(data.outputParameters.response) : null;
-
-        setSurveys(parsedResponse && parsedResponse.response ? parsedResponse.response.questions || [] : []);
-        setLoading(false);
-        toast.info("Remember, all surveys are anonymous!");
+  
+        console.log("Response from API:", response);
+  
+        if (response && response.status === 200 && response.response && response.response.questions) {
+          setSurveys(response.response.questions);
+          toast.info("Remember, all surveys are anonymous!");
+        } else {
+          // Handle any case where the response is not as expected
+          setSurveys([]);
+          console.error('Unexpected API response structure:', response);
+        }
       } catch (error) {
         setError(error.message);
+        console.error("Dashboard fetch data error:", error);
+      } finally {
         setLoading(false);
-        console.error("dashboard fetch data error:", error);
       }
     };
+  
     if (userId && userType) {
       fetchData();
     }
   }, [userId, userType]);
+  
+  
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
