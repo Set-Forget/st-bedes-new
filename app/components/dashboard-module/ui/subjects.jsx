@@ -1,42 +1,38 @@
 import React, { useState, useEffect } from "react";
 
-export const Subjects = ({ surveys, onSelect, filterType }) => {
+export const Subjects = ({ surveys, onSelect, filterType, isAcademicOpen }) => {
   const [subjects, setSubjects] = useState([]);
 
-  const isSubjectCompleted = (subjectName) => {
-    const relatedQuestions = surveys.filter(
-      (q) => q.subject_name === subjectName
-    );
-    return relatedQuestions.every((q) => q.is_answered);
-  };
-
   useEffect(() => {
-    if (Array.isArray(surveys)) {
+    if (Array.isArray(surveys) && isAcademicOpen) {
       // Group surveys by subject name
       const subjectsMap = surveys.reduce((acc, survey) => {
-        const { subject_name, is_open } = survey;
-        if (!acc[subject_name]) {
-          acc[subject_name] = { isOpen: is_open, questions: [] };
+        const { subject_name } = survey;
+        if (subject_name) {
+          if (!acc[subject_name]) {
+            acc[subject_name] = { questions: [] };
+          }
+          acc[subject_name].questions.push(survey);
         }
-        acc[subject_name].questions.push(survey);
-        acc[subject_name].isOpen = acc[subject_name].isOpen || is_open; // If any question is open, the subject is considered open
         return acc;
       }, {});
-
-      // Filter subjects based on filterType and isOpen status
-      const filteredSubjects = Object.keys(subjectsMap).filter((subject) => {
+  
+      const filteredSubjects = Object.keys(subjectsMap).filter(subject => {
         const subjectData = subjectsMap[subject];
-        if (filterType === "completed") {
-          return subjectData.questions.every((q) => q.is_answered);
-        } else if (filterType === "pending") {
-          return subjectData.questions.some((q) => !q.is_answered);
+        if (filterType === 'completed') {
+          return subjectData.questions.every(q => q.is_answered);
+        } else if (filterType === 'pending') {
+          return subjectData.questions.some(q => !q.is_answered);
         }
-        return subjectData.isOpen;
+        return true; 
       });
-
+  
       setSubjects(filteredSubjects);
+    } else {
+      setSubjects([]);
     }
-  }, [surveys, filterType]);
+  }, [surveys, filterType, isAcademicOpen]);
+  
 
   const calculateTeacherSurveys = (subject) => {
     const relatedSurveys = surveys.filter((s) => s.subject_name === subject);
@@ -77,7 +73,7 @@ export const Subjects = ({ surveys, onSelect, filterType }) => {
 
   return (
     <div>
-      {subjects.length === 0 || !subjects.includes("Academic") ? (
+      {!isAcademicOpen ? (
         <div className="text-center text-sm py-5 bg-gray-100 ring-1 ring-inset ring-gray-300 rounded-md my-12 px-4">
           Academic surveys are not available right now
         </div>

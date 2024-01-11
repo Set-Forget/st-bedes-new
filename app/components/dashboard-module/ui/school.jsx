@@ -1,13 +1,9 @@
-export const School = ({ survey, onSelect, filterType }) => {
-  const isOpen = survey.some((question) => question.is_open);
-  const isCompleted = survey.every((question) => question.is_answered);
+export const School = ({ survey, onSelect, filterType, isSchoolOpen }) => {
+  // Check if the entire survey is completed
+  const isCompleted = survey.every(question => question.is_answered);
 
-  // Render condition based on filter type
-  if (filterType === 'completed' && !isCompleted) return null;
-  if (filterType === 'pending' && isCompleted) return null;
-
-  // Check if the survey category is closed
-  if (!isOpen) {
+  // If the school survey is not open, display the message that it's not available
+  if (!isSchoolOpen) {
     return (
       <div className="text-center text-sm py-5 bg-gray-100 ring-1 ring-inset ring-gray-300 rounded-md my-12 px-4">
         The School survey is not available right now
@@ -15,6 +11,13 @@ export const School = ({ survey, onSelect, filterType }) => {
     );
   }
 
+  // If the survey is open but does not meet the filter criteria, do not render it
+  if ((filterType === 'completed' && !isCompleted) || 
+      (filterType === 'pending' && isCompleted)) {
+    return null;
+  }
+
+  // Get survey status for display
   const getSurveyStatus = () => {
     return isCompleted ? (
       <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
@@ -27,6 +30,7 @@ export const School = ({ survey, onSelect, filterType }) => {
     );
   };
 
+  // Render the School survey list item
   return (
     <ul role="list" className="divide-y divide-gray-200">
       <li className="flex items-center justify-between sm:gap-x-96 gap-x-36 py-5">
@@ -43,8 +47,8 @@ export const School = ({ survey, onSelect, filterType }) => {
         </div>
         <div className="flex flex-none items-center gap-x-4">
           <button
-            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300"
-            onClick={() => onSelect()}
+            className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            onClick={() => onSelect('School')}
             disabled={isCompleted}
           >
             Choose

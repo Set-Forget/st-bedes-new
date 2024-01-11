@@ -50,6 +50,8 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterType, setFilterType] = useState("all");
+  const [isAcademicOpen, setIsAcademicOpen] = useState(true);
+  const [isSchoolOpen, setIsSchoolOpen] = useState(true);
 
   const categorizedQuestions = useCategorizedQuestions(surveys, userType);
   const academicSurveys = categorizedQuestions.studentSurveys.academicSurveys;
@@ -63,21 +65,22 @@ const DashboardPage = () => {
     [categorizedQuestions]
   );
 
-  console.log("All Parent Surveys:", allParentSurveys);
+  console.log("All student surveys", surveys);
 
   const uniqueChildren = useMemo(() => {
     const allChildren = allParentSurveys.map((survey) => ({
       id: survey.student_id,
-      full_name: survey.full_name, 
+      full_name: survey.full_name,
     }));
     const uniqueIds = Array.from(new Set(allChildren.map((child) => child.id)));
     return uniqueIds.map((id) => {
       const foundChild = allChildren.find((child) => child.id === id);
-      return { id, full_name: foundChild ? foundChild.full_name : 'Name not found' };
+      return {
+        id,
+        full_name: foundChild ? foundChild.full_name : "Name not found",
+      };
     });
   }, [allParentSurveys]);
-  
-  console.log("Unique Children caca:", uniqueChildren);
 
   // fetch all questions based on the type of user logged in
   useEffect(() => {
@@ -87,25 +90,33 @@ const DashboardPage = () => {
       try {
         setLoading(true);
         let response;
-      
+
         if (userType === "student") {
           response = await getStudentQuestion(userId);
+          console.log("NEW RESPONSE", response);
+          setIsAcademicOpen(response.response.is_academic_open);
+          setIsSchoolOpen(response.response.is_school_open);
         } else if (userType === "parent") {
           response = await getParentQuestion(userId);
         }
-      
+
         let questions;
-        if (userType === "student" && response && response.response && response.response.questions) {
+        if (
+          userType === "student" &&
+          response &&
+          response.response &&
+          response.response.questions
+        ) {
           questions = response.response.questions;
         } else if (userType === "parent" && response && response.length) {
           questions = response;
         } else {
           // Handle any case where the response is not as expected
           setSurveys([]);
-          console.error('Unexpected API response structure:', response);
+          console.error("Unexpected API response structure:", response);
           return;
         }
-    
+
         setSurveys(questions);
         toast.info("Remember, all surveys are anonymous!");
       } catch (error) {
@@ -114,7 +125,7 @@ const DashboardPage = () => {
       } finally {
         setLoading(false);
       }
-    };    
+    };
 
     if (userId && userType) {
       fetchData();
@@ -122,6 +133,7 @@ const DashboardPage = () => {
   }, [userId, userType]);
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
+  const hasCompletedSurveys = completedSurveys.length > 0;
 
   // groups questions by set id, for progress bar counter
   const groupQuestionsBySetId = (questions) => {
@@ -204,6 +216,7 @@ const DashboardPage = () => {
               survey={schoolSurvey}
               onSelect={() => setSelectedSubject("School")}
               filterType={filterType}
+              isSchoolOpen={isSchoolOpen}
             />
           )}
 
@@ -221,6 +234,7 @@ const DashboardPage = () => {
                 surveys={displayedSurveys}
                 onSelect={setSelectedSubject}
                 filterType={filterType}
+                isAcademicOpen={isAcademicOpen}
               />
             </>
           )}
@@ -317,11 +331,12 @@ const DashboardPage = () => {
                       </button>
                       <button
                         onClick={() => setFilterType("completed")}
-                        className={`px-3 py-1 rounded ${
+                        className={`px-3 py-1 rounded disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300 ${
                           filterType === "completed"
                             ? "bg-bedeblue text-white"
                             : "bg-gray-200"
                         }`}
+                        disabled={!hasCompletedSurveys}
                       >
                         Completed
                       </button>
