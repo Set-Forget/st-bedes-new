@@ -1,9 +1,19 @@
 export const School = ({ survey, onSelect, filterType }) => {
+  const isOpen = survey.some((question) => question.is_open);
   const isCompleted = survey.every((question) => question.is_answered);
 
   // Render condition based on filter type
   if (filterType === 'completed' && !isCompleted) return null;
   if (filterType === 'pending' && isCompleted) return null;
+
+  // Check if the survey category is closed
+  if (!isOpen) {
+    return (
+      <div className="text-center text-sm py-5 bg-gray-100 ring-1 ring-inset ring-gray-300 rounded-md my-12 px-4">
+        The School survey is not available right now
+      </div>
+    );
+  }
 
   const getSurveyStatus = () => {
     return isCompleted ? (
@@ -35,7 +45,7 @@ export const School = ({ survey, onSelect, filterType }) => {
           <button
             className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300"
             onClick={() => onSelect()}
-            disabled={survey.every((question) => question.is_answered)}
+            disabled={isCompleted}
           >
             Choose
           </button>

@@ -38,7 +38,7 @@ const DashboardPage = () => {
         console.log("Last submitted subject (inside if):", lastSubject);
       }
     }
-  }, []);  
+  }, []);
 
   const userType = user?.student_id ? "student" : "parent";
   const userId = user?.student_id || user?.parent_id;
@@ -78,42 +78,49 @@ const DashboardPage = () => {
   // fetch all questions based on the type of user logged in
   useEffect(() => {
     if (!userId) return;
-  
+
     const fetchData = async () => {
       try {
         setLoading(true);
         let response;
-  
+      
         if (userType === "student") {
           response = await getStudentQuestion(userId);
         } else if (userType === "parent") {
           response = await getParentQuestion(userId);
         }
-  
+      
         console.log("Response from API:", response);
-  
-        if (response && response.status === 200 && response.response && response.response.questions) {
-          setSurveys(response.response.questions);
-          toast.info("Remember, all surveys are anonymous!");
+      
+        let questions;
+        if (userType === "student" && response && response.response && response.response.questions) {
+          questions = response.response.questions;
+        } else if (userType === "parent" && response && response.length) {
+          questions = response;
         } else {
           // Handle any case where the response is not as expected
           setSurveys([]);
           console.error('Unexpected API response structure:', response);
+          return;
         }
+    
+        setSurveys(questions);
+        toast.info("Remember, all surveys are anonymous!");
       } catch (error) {
         setError(error.message);
         console.error("Dashboard fetch data error:", error);
       } finally {
         setLoading(false);
       }
-    };
-  
+    };    
+
     if (userId && userType) {
       fetchData();
     }
   }, [userId, userType]);
-  
-  
+
+  console.log("All Parent Surveys:", allParentSurveys);
+  console.log("Unique Children:", uniqueChildren);
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
@@ -203,7 +210,13 @@ const DashboardPage = () => {
             />
           )}
 
-          <h2 className={`font-bold text-2xl ${selectedTeacher ? 'opacity-0' : 'opacity-100'}`}>Academic</h2>
+          <h2
+            className={`font-bold text-2xl ${
+              selectedTeacher ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            Academic
+          </h2>
           {!selectedSubject && (
             <>
               {loading && <SpinnerBlack />}
@@ -235,7 +248,7 @@ const DashboardPage = () => {
     } else if (userType === "parent") {
       return (
         <div className="overflow-x-hidden">
-          <h2 className="font-bold text-2xl">Select a Child</h2>
+          <h2 className="font-bold text-2xl">Your children's surveys</h2>
           <Children
             surveys={uniqueChildren}
             onSelect={setSelectedChild}
@@ -278,55 +291,55 @@ const DashboardPage = () => {
               <div className=" top-0 w-4/5 sm:w-[548px] pt-48">
                 {!selectedSubject && (
                   <div className="max-w-screen-lg mx-auto">
-                  {/* progress bar */}
-                  <div className="mb-4">
-                    <p className="text-xs">{progressBarDisplay}</p>
-                    <div className="w-full bg-gray-300 rounded-full h-2">
-                      <div
-                        className="bg-gray-700 h-2 rounded-full"
-                        style={{
-                          width: `${
-                            (completedSurveysCount / totalSurveysCount) * 100
-                          }%`,
-                        }}
-                      ></div>
+                    {/* progress bar */}
+                    <div className="mb-4">
+                      <p className="text-xs">{progressBarDisplay}</p>
+                      <div className="w-full bg-gray-300 rounded-full h-2">
+                        <div
+                          className="bg-gray-700 h-2 rounded-full"
+                          style={{
+                            width: `${
+                              (completedSurveysCount / totalSurveysCount) * 100
+                            }%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* filter buttons */}
+                    <div className="flex space-x-2 text-xs">
+                      <button
+                        onClick={() => setFilterType("all")}
+                        className={`px-3 py-1 rounded ${
+                          filterType === "all"
+                            ? "bg-bedeblue text-white"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={() => setFilterType("completed")}
+                        className={`px-3 py-1 rounded ${
+                          filterType === "completed"
+                            ? "bg-bedeblue text-white"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        Completed
+                      </button>
+                      <button
+                        onClick={() => setFilterType("pending")}
+                        className={`px-3 py-1 rounded ${
+                          filterType === "pending"
+                            ? "bg-bedeblue text-white"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        Pending
+                      </button>
                     </div>
                   </div>
-
-                  {/* filter buttons */}
-                  <div className="flex space-x-2 text-xs">
-                    <button
-                      onClick={() => setFilterType("all")}
-                      className={`px-3 py-1 rounded ${
-                        filterType === "all"
-                          ? "bg-bedeblue text-white"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      All
-                    </button>
-                    <button
-                      onClick={() => setFilterType("completed")}
-                      className={`px-3 py-1 rounded ${
-                        filterType === "completed"
-                          ? "bg-bedeblue text-white"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      Completed
-                    </button>
-                    <button
-                      onClick={() => setFilterType("pending")}
-                      className={`px-3 py-1 rounded ${
-                        filterType === "pending"
-                          ? "bg-bedeblue text-white"
-                          : "bg-gray-200"
-                      }`}
-                    >
-                      Pending
-                    </button>
-                  </div>
-                </div>
                 )}
               </div>
             )}
