@@ -47,7 +47,7 @@ export const Children = ({
               <div className="min-w-0">
                 <div className="flex items-start gap-x-3">
                   <p className="text-sm font-semibold leading-6 text-gray-900">
-                    {child.name}
+                    {child.full_name}
                   </p>
                 </div>
                 <div className="flex flex-col space-y-8">

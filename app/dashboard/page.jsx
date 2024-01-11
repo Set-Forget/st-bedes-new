@@ -31,11 +31,9 @@ const DashboardPage = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const lastSubject = sessionStorage.getItem("lastSubmittedSubject");
-      console.log("Last submitted subject (outside useEffect):", lastSubject);
       if (lastSubject) {
         setSelectedSubject(lastSubject);
         sessionStorage.removeItem("lastSubmittedSubject");
-        console.log("Last submitted subject (inside if):", lastSubject);
       }
     }
   }, []);
@@ -65,15 +63,21 @@ const DashboardPage = () => {
     [categorizedQuestions]
   );
 
+  console.log("All Parent Surveys:", allParentSurveys);
+
   const uniqueChildren = useMemo(() => {
     const allChildren = allParentSurveys.map((survey) => ({
       id: survey.student_id,
-      name: survey.student_full_name,
+      full_name: survey.full_name, 
     }));
-    return Array.from(new Set(allChildren.map((child) => child.id))).map((id) =>
-      allChildren.find((child) => child.id === id)
-    );
+    const uniqueIds = Array.from(new Set(allChildren.map((child) => child.id)));
+    return uniqueIds.map((id) => {
+      const foundChild = allChildren.find((child) => child.id === id);
+      return { id, full_name: foundChild ? foundChild.full_name : 'Name not found' };
+    });
   }, [allParentSurveys]);
+  
+  console.log("Unique Children caca:", uniqueChildren);
 
   // fetch all questions based on the type of user logged in
   useEffect(() => {
@@ -89,8 +93,6 @@ const DashboardPage = () => {
         } else if (userType === "parent") {
           response = await getParentQuestion(userId);
         }
-      
-        console.log("Response from API:", response);
       
         let questions;
         if (userType === "student" && response && response.response && response.response.questions) {
@@ -118,9 +120,6 @@ const DashboardPage = () => {
       fetchData();
     }
   }, [userId, userType]);
-
-  console.log("All Parent Surveys:", allParentSurveys);
-  console.log("Unique Children:", uniqueChildren);
 
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
 
@@ -176,8 +175,6 @@ const DashboardPage = () => {
   const isSchoolSurveyCompleted = schoolSurvey.every(
     (question) => question.is_answered
   );
-
-  console.log("surveys", surveys);
 
   // rendered content based on user type
   const content = useMemo(() => {
