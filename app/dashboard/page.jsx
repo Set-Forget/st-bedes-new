@@ -248,7 +248,7 @@ const DashboardPage = () => {
     } else if (userType === "parent") {
       return (
         <div className="overflow-x-hidden">
-          <h2 className="font-bold text-2xl">Your children's surveys</h2>
+          <h2 className="font-bold text-2xl">Your children&apos;s surveys</h2>
           <Children
             surveys={uniqueChildren}
             onSelect={setSelectedChild}
