@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export const Children = ({
   surveys,
@@ -14,25 +14,33 @@ export const Children = ({
     );
   };
 
-  // Determine the survey status for each child
-  const getSurveyStatus = (childId) => {
-    if (completedSurveys.some((survey) => survey.student_id === childId)) {
-      return (
-        <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs text-center">
-          Completed
-        </span>
+  useEffect(() => {
+    console.log('SURVEYS IN CHILDREN COMPONENT', surveys);
+    console.log('pending', pendingSurveys);
+    console.log('completed', completedSurveys);
+  }, [surveys])
+
+  const isChildSurveyCompletelyCompleted = (childId) => {
+    const sections = ["Section A: Safety, Welfare and Personal Development", "Section B: The quality of education", "Section C"];
+    return sections.every(section => {
+      const sectionSurveys = [...pendingSurveys, ...completedSurveys].filter(
+        survey => survey.student_id === childId && survey.section === section
       );
-    } else if (pendingSurveys.some((survey) => survey.student_id === childId)) {
-      return (
-        <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs text-center">
-          Pending
-        </span>
-      );
-    }
+      // If no surveys are found for this section, it's not completed
+      if (sectionSurveys.length === 0) {
+        return false;
+      }
+      // Check if every survey in this section is completed
+      return sectionSurveys.every(survey => survey.is_answered);
+    });
   };
 
-  const isChildSurveyCompleted = (childId) => {
-    return completedSurveys.some((survey) => survey.student_id === childId);
+  const getSurveyStatus = (childId) => {
+    return isChildSurveyCompletelyCompleted(childId) ? (
+      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs text-center">Completed</span>
+    ) : (
+      <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs text-center">Pending</span>
+    );
   };
 
   return (
@@ -61,9 +69,9 @@ export const Children = ({
                 <button
                   className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-300"
                   onClick={() => onSelect(child)}
-                  disabled={isChildSurveyCompleted(child.id)}
+                  disabled={isChildSurveyCompletelyCompleted(child.id)}
                 >
-                  Choose<span className="sr-only">, {child.name}</span>
+                  Choose<span className="sr-only">, {child.full_name}</span>
                 </button>
               </div>
             </li>
