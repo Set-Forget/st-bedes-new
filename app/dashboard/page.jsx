@@ -135,6 +135,10 @@ const DashboardPage = () => {
   const { pendingSurveys, completedSurveys } = useSurveyStatus(surveys);
   const hasCompletedSurveys = completedSurveys.length > 0;
 
+  const hasCompletedAcademicSurveys = useMemo(() => {
+    return academicSurveys.some((survey) => survey.is_answered);
+  }, [academicSurveys]);
+
   // groups questions by set id, for progress bar counter
   const groupQuestionsBySetId = (questions) => {
     return questions.reduce((acc, question) => {
@@ -173,7 +177,7 @@ const DashboardPage = () => {
     } else if (userType === "parent" && selectedChild) {
       router.prefetch(`/dashboard/${selectedChild.id}`);
       router.push(`/dashboard/${selectedChild.id}`);
-      localStorage.setItem("childName", selectedChild.name);
+      localStorage.setItem("childName", selectedChild.full_name);
     }
   }, [selectedTeacher, selectedSubject, selectedChild]);
 
@@ -204,6 +208,12 @@ const DashboardPage = () => {
       (filterType === "completed" && isSchoolSurveyCompleted) ||
       (filterType === "pending" && !isSchoolSurveyCompleted);
 
+    const showAcademicHeader =
+      filterType === "all" ||
+      (filterType === "completed" && hasCompletedAcademicSurveys) ||
+      (filterType === "pending" &&
+        academicSurveys.some((survey) => !survey.is_answered));
+
     if (userType === "student") {
       return (
         <div className="flex flex-col overflow-x-hidden py-32">
@@ -220,13 +230,15 @@ const DashboardPage = () => {
             />
           )}
 
-          <h2
-            className={`font-bold text-2xl ${
-              selectedTeacher ? "opacity-0" : "opacity-100"
-            }`}
-          >
-            Academic
-          </h2>
+          {showAcademicHeader && (
+            <h2
+              className={`font-bold text-2xl ${
+                selectedTeacher ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              Academic
+            </h2>
+          )}
           {!selectedSubject && (
             <>
               {loading && <SpinnerBlack />}
@@ -279,6 +291,7 @@ const DashboardPage = () => {
     completedSurveysCount,
     totalSurveysCount,
     isSchoolSurveyCompleted,
+    hasCompletedAcademicSurveys
   ]);
 
   if (error) return <p>Oops, something unexpected happened: {error}</p>;
