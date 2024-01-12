@@ -12,7 +12,8 @@ export const useDecodedSurveyId = () => {
   }
 
   const decoded = decodeURIComponent(survey_id);
-  const [subject, teacher] = decoded.split("-");
+  const [subject, ...teacherParts] = decoded.split("-");
+  const teacher = teacherParts.join('-'); 
 
   return { subject, teacher, child: null };
 };
