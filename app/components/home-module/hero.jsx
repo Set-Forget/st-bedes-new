@@ -20,7 +20,7 @@ const Hero = ({ username }) => {
         </h3>
         {/* <div className="pointer-events-none shape01 absolute bottom-96 left-96 sm:w-[20vw] sm:h-[20vw] w-48 h-48 bg-bedeyellow rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob"></div>
         <div className="pointer-events-none shape02 absolute top-48 left-48 sm:w-[25vw] sm:h-[25vw] w-48 h-48 bg-bedeblue rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-blob animation-delay-2000"></div> */}
-        <svg
+        {/* <svg
           className="-z-10 absolute -top-2 right-20 scale-50 2xl:top-0 2xl:right-20 3xl:scale-100 hidden sm:block"
           xmlns="http://www.w3.org/2000/svg"
           width="630"
@@ -36,7 +36,7 @@ const Hero = ({ username }) => {
             stroke="#D51F1F" 
             strokeWidth="8" 
           />
-        </svg>
+        </svg> */}
       </div>
       <Image src={gradientAbs} className="absolute z-10 glowing-effect sm:scale-100 scale-[200%]"/>
     </div>
