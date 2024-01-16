@@ -16,6 +16,7 @@ const Questionnaire = ({
     formState: { errors },
   } = useForm({ shouldUnregister: false });
   const [user, setUser] = useState(null);
+  const [sortedQuestions, setSortedQuestions] = useState([]);
 
   const hasMultipleTeachers = (questions) => {
     // Check if questions is defined and is an array before proceeding
@@ -33,6 +34,12 @@ const Questionnaire = ({
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     setUser(storedUser || {});
+  
+    if (questions && Array.isArray(questions)) {
+      setSortedQuestions([...questions].sort((a, b) => a.row_number - b.row_number));
+    }
+
+    console.log("SORTED QUESTIONS IN Q", sortedQuestions);
   }, []);
 
   const userType = user?.student_id ? "student" : "parent";
@@ -55,18 +62,16 @@ const Questionnaire = ({
       row_number: question.row_number,
       student_id: question.student_id,
       question_id: question.question_id,
-      set_id: question.set_id, // include only if you have the data
-      teacher_id: question.teacher_id, // include only if you have the data
+      set_id: question.set_id, 
+      teacher_id: question.teacher_id, 
       answer: data[question.question_id.toString()],
     }));
   
-    // Prepare the payload as expected by the server
     const payload = {
       action: userType === "student" ? "saveStudentAnswers" : "saveParentAnswers",
-      data: answers, // This is the array of answers
+      data: answers, 
     };
   
-    // Select the appropriate API function based on the user type
     const saveFunction = userType === "student" ? postStudentAnswers : postParentAnswers;
   
     saveFunction(payload.action, payload)
@@ -101,6 +106,7 @@ const Questionnaire = ({
           options={question.options ? parseOptions(question.options) : []}
           register={register}
           name={question.question_id.toString()}
+          answer={question.answer}
         />
         {errors[question.question_id.toString()] && (
           <p className="text-sm text-red-500">
@@ -116,7 +122,7 @@ const Questionnaire = ({
       onSubmit={handleSubmit(onSubmit)}
       className="questionnaire-container py-16 sm:px-0 sm:py-0 flex flex-col justify-center"
     >
-      {questions.map(renderQuestion)}
+      {sortedQuestions.map(renderQuestion)}
       <button
         type="submit"
         className="rounded-md bg-white px-2.5 py-1.5 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 self-center mb-16"
