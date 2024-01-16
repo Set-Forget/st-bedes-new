@@ -31,11 +31,13 @@ const GoogleAuth = () => {
           try {
             const emailCheckResponse = await fetchApi(
               action,
-              { studentEmail: encodeURIComponent(email) },
+              { studentEmail: email },
               "GET"
             );
 
             if (emailCheckResponse.status === 200) {
+              console.log(emailCheckResponse, 'email check response');
+              
               sessionStorage.setItem(
                 "user",
                 JSON.stringify(emailCheckResponse.response)
@@ -44,6 +46,8 @@ const GoogleAuth = () => {
             } else {
               console.error("User is not authorized or email is invalid");
               toast.error("Your account is not on St Bede's Database");
+
+              console.log(emailCheckResponse, 'email check response');
             }
           } catch (error) {
             console.error("Error checking email:", error);
