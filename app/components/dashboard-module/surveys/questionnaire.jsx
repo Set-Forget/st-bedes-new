@@ -4,17 +4,19 @@ import Question from "./question";
 import InputType from "./inputType";
 import { postParentAnswers, postStudentAnswers } from "@/app/core/api/save";
 import SimpleSpinner from "../../spinner-component/simpleSpinner";
+import { Toaster, toast } from "sonner";
 
 const Questionnaire = ({
   questions,
   onSubmitSuccess,
   allQuestionsForSubject,
 }) => {
+  const [unsavedAnswers, setUnsavedAnswers] = useState({});
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ shouldUnregister: false });
+  } = useForm({ shouldUnregister: false, defaultValues: unsavedAnswers });
   const [user, setUser] = useState(null);
 
   const hasMultipleTeachers = (questions) => {
@@ -33,7 +35,11 @@ const Questionnaire = ({
   useEffect(() => {
     const storedUser = JSON.parse(sessionStorage.getItem("user"));
     setUser(storedUser || {});
-    console.log("QUESTIONS IN Q", questions)
+
+    const unsavedAnswers = JSON.parse(localStorage.getItem("unsavedAnswers"));
+    if (unsavedAnswers) {
+      setUnsavedAnswers(unsavedAnswers);
+    }
   }, []);
 
   const userType = user?.student_id ? "student" : "parent";
@@ -51,44 +57,45 @@ const Questionnaire = ({
 
   const onSubmit = (data) => {
     setLoading(true);
-  
+
     const answers = questions.map((question) => ({
       row_number: question.row_number,
       student_id: question.student_id,
       question_id: question.question_id,
-      set_id: question.set_id, // include only if you have the data
-      teacher_id: question.teacher_id, // include only if you have the data
+      set_id: question.set_id,
+      teacher_id: question.teacher_id,
       answer: data[question.question_id.toString()],
     }));
-  
+
     // Prepare the payload as expected by the server
     const payload = {
-      action: userType === "student" ? "saveStudentAnswers" : "saveParentAnswers",
-      data: answers, // This is the array of answers
+      action:
+        userType === "student" ? "saveStudentAnswers" : "saveParentAnswers",
+      data: answers,
     };
-  
-    // Select the appropriate API function based on the user type
-    const saveFunction = userType === "student" ? postStudentAnswers : postParentAnswers;
-  
+
+    const saveFunction =
+      userType === "student" ? postStudentAnswers : postParentAnswers;
+
     saveFunction(payload.action, payload)
       .then((response) => {
+        localStorage.removeItem("unsavedAnswers");
         if (response.status === 200 || response.status === 201) {
           setFeedbackMessage("Answers successfully saved!");
           if (onSubmitSuccess) onSubmitSuccess();
         } else {
-          setFeedbackMessage("There was an issue saving your answers. Please try again later.");
+          toast.error("Oops! Your answers could not be saved, please refresh and try again");
         }
       })
       .catch((error) => {
         console.error(`Couldn't save ${userType} answers:`, error);
-        setFeedbackMessage("There was an error saving your answers. Please try again later.");
+        localStorage.setItem("unsavedAnswers", JSON.stringify(data));
+        toast.error("Oops! Your answers could not be saved, please refresh and try again");
       })
       .finally(() => {
         setLoading(false);
       });
   };
-  
-  
 
   const renderQuestion = (question) => {
     return (
@@ -113,10 +120,11 @@ const Questionnaire = ({
     );
   };
 
-  const sortedQuestions = [...questions].sort((a, b) => a.row_number - b.row_number);
-  console.log(sortedQuestions, 'SORTED');
-  console.log(questions, 'NOT SORTED');
-
+  const sortedQuestions = [...questions].sort(
+    (a, b) => a.row_number - b.row_number
+  );
+  console.log(sortedQuestions, "SORTED");
+  console.log(questions, "NOT SORTED");
 
   return (
     <form
@@ -130,6 +138,7 @@ const Questionnaire = ({
       >
         {loading ? <SimpleSpinner /> : "Submit"}
       </button>
+      <Toaster richColors position="bottom-center" />
     </form>
   );
 };
