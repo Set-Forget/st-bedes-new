@@ -192,16 +192,36 @@ const DashboardPage = () => {
     (question) => question.is_answered
   );
 
+  const getSurveyCompletionStatus = (surveys) => {
+    return surveys.reduce((acc, survey) => {
+      if (!acc[survey.subject_name]) {
+        acc[survey.subject_name] = { completed: 0, total: 0 };
+      }
+      acc[survey.subject_name].total++;
+      if (survey.is_answered) {
+        acc[survey.subject_name].completed++;
+      }
+      return acc;
+    }, {});
+  };
+  
+  const displayedSurveys = useMemo(() => {
+    const completionStatus = getSurveyCompletionStatus(surveys);
+  
+    return surveys.filter((survey) => {
+      const status = completionStatus[survey.subject_name];
+      if (filterType === "completed") {
+        return status.completed === status.total;
+      } else if (filterType === "pending") {
+        return status.completed < status.total;
+      }
+      return true;
+    });
+  }, [surveys, filterType]);
+  
+
   // rendered content based on user type
   const content = useMemo(() => {
-    let displayedSurveys;
-    if (filterType === "completed") {
-      displayedSurveys = surveys.filter((survey) => survey.is_answered);
-    } else if (filterType === "pending") {
-      displayedSurveys = surveys.filter((survey) => !survey.is_answered);
-    } else {
-      displayedSurveys = surveys;
-    }
 
     const showSchoolHeader =
       filterType === "all" ||
